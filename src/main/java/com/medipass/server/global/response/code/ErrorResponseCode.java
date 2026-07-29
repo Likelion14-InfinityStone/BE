@@ -13,7 +13,9 @@ public enum ErrorResponseCode implements BaseResponseCode {
     INVALID_HTTP_MESSAGE_PARAMETER(HttpStatus.BAD_REQUEST, "GLOBAL_400_3", "HTTP 요청 파라미터 형식이 잘못되었습니다."),
 
     // 401 Unauthorized
-    UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "GLOBAL_401", "인증이 필요합니다."),
+    UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "GLOBAL_401_1", "인증이 필요합니다."),
+    EXPIRED_TOKEN(HttpStatus.UNAUTHORIZED, "GLOBAL_401_2", "만료된 토큰입니다."),
+    INVALID_TOKEN(HttpStatus.UNAUTHORIZED, "GLOBAL_401_3", "유효하지 않은 토큰입니다."),
 
     // 403 Forbidden
     ACCESS_DENIED(HttpStatus.FORBIDDEN, "GLOBAL_403", "해당 요청에 접근 권한이 없습니다."),
