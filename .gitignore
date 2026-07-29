@@ -46,3 +46,8 @@ out/
 ### Logs ###
 *.log
 logs/
+
+### Secrets ###
+# 실제 비밀 설정 — 커밋 금지 (.example 만 커밋)
+application-secret.properties
+**/application-secret.properties
