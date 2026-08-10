@@ -12,7 +12,15 @@ public record OcrApiResponse(
     public record ImageResult(
             String inferResult,
             String message,
+            ConvertedImageInfo convertedImageInfo,
             List<Field> fields
+    ) {
+    }
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public record ConvertedImageInfo(
+            Integer width,
+            Integer height
     ) {
     }
 
@@ -20,7 +28,21 @@ public record OcrApiResponse(
     public record Field(
             String inferText,
             Double inferConfidence,
-            Boolean lineBreak
+            Boolean lineBreak,
+            BoundingPoly boundingPoly
+    ) {
+    }
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public record BoundingPoly(
+            List<Vertex> vertices
+    ) {
+    }
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public record Vertex(
+            Double x,
+            Double y
     ) {
     }
 }
