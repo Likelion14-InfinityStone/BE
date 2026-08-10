@@ -1,7 +1,7 @@
 package com.medipass.server.domain.medication.controller;
 
+import com.medipass.server.domain.medication.dto.response.MedicationScanResponse;
 import com.medipass.server.domain.medication.service.MedicationScanService;
-import com.medipass.server.global.ocr.dto.OcrResult;
 import com.medipass.server.global.response.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -23,14 +23,14 @@ public class MedicationScanController {
     private final MedicationScanService medicationScanService;
 
     @Operation(
-            summary = "약 봉투 OCR",
-            description = "카메라로 촬영하거나 갤러리에서 선택한 약 봉투 이미지의 텍스트를 추출합니다."
+            summary = "약 봉투 인식",
+            description = "약 봉투 이미지에서 조제 및 복용 정보를 추출하고 구조화하여 반환합니다."
     )
-    @PostMapping(value = "/ocr", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ApiResponse<OcrResult> extract(
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ApiResponse<MedicationScanResponse> scan(
             @Parameter(description = "약 봉투 이미지(JPEG 또는 PNG)", required = true)
             @RequestPart("file") MultipartFile file
     ) {
-        return ApiResponse.success(medicationScanService.extract(file));
+        return ApiResponse.success(medicationScanService.scan(file));
     }
 }
