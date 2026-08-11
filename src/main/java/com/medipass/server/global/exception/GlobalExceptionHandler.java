@@ -3,6 +3,7 @@ package com.medipass.server.global.exception;
 import com.medipass.server.global.response.ApiResponse;
 import com.medipass.server.global.response.ErrorDetail;
 import com.medipass.server.global.response.FieldError;
+import com.medipass.server.global.ocr.exception.OcrErrorCode;
 import com.medipass.server.global.response.code.BaseResponseCode;
 import com.medipass.server.global.response.code.ErrorResponseCode;
 import lombok.extern.slf4j.Slf4j;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.multipart.support.MissingServletRequestPartException;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
@@ -80,6 +82,13 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiResponse<Object>> handleMissingPart(MissingServletRequestPartException e) {
         log.warn("MissingServletRequestPartException: {}", e.getMessage());
         return error(ErrorResponseCode.INVALID_HTTP_MESSAGE_PARAMETER);
+    }
+
+    /** 서버의 멀티파트 제한을 초과한 파일 업로드 */
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    public ResponseEntity<ApiResponse<Object>> handleMaxUploadSizeExceeded(MaxUploadSizeExceededException e) {
+        log.warn("MaxUploadSizeExceededException: {}", e.getMessage());
+        return error(OcrErrorCode.FILE_TOO_LARGE);
     }
 
     /** 지원하지 않는 HTTP 메서드 */

@@ -4,7 +4,8 @@ import com.medipass.server.global.exception.BaseException;
 import com.medipass.server.global.ocr.config.OcrProperties;
 import com.medipass.server.global.ocr.dto.OcrApiRequest;
 import com.medipass.server.global.ocr.dto.OcrApiResponse;
-import com.medipass.server.global.ocr.dto.OcrResult;
+import com.medipass.server.global.ocr.dto.OcrTextField;
+import com.medipass.server.global.ocr.dto.OcrTextResult;
 import com.medipass.server.global.ocr.exception.OcrErrorCode;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -50,7 +51,7 @@ public class OcrClientImpl implements OcrClient {
     }
 
     @Override
-    public OcrResult extract(MultipartFile file) {
+    public OcrTextResult extract(MultipartFile file) {
         validate(file);
 
         try {
@@ -113,7 +114,7 @@ public class OcrClientImpl implements OcrClient {
         return body;
     }
 
-    private OcrResult toResult(OcrApiResponse response) {
+    private OcrTextResult toResult(OcrApiResponse response) {
         // OCR 응답이 없으면 인식 실패 처리
         if (response == null || response.images() == null || response.images().isEmpty()) {
             throw new BaseException(OcrErrorCode.OCR_NOT_RECOGNIZED);
@@ -154,7 +155,36 @@ public class OcrClientImpl implements OcrClient {
             throw new BaseException(OcrErrorCode.OCR_NOT_RECOGNIZED);
         }
 
-        return new OcrResult(String.join("\n", lines), List.copyOf(lines));
+        // 구조화 시 표의 위치 관계를 활용할 수 있도록 각 텍스트의 좌표 정보 저장
+        List<OcrTextField> textFields = image.fields().stream()
+                .filter(field -> field.inferText() != null && !field.inferText().isBlank())
+                .map(field -> new OcrTextField(
+                        field.inferText().trim(),
+                        coordinate(field, true),
+                        coordinate(field, false)
+                ))
+                .toList();
+
+        OcrApiResponse.ConvertedImageInfo imageInfo = image.convertedImageInfo();
+        return new OcrTextResult(
+                String.join("\n", lines),
+                List.copyOf(lines),
+                textFields,
+                imageInfo == null ? null : imageInfo.width(),
+                imageInfo == null ? null : imageInfo.height()
+        );
+    }
+
+    // 텍스트 영역의 첫 번째 꼭짓점에서 x 또는 y 좌표 추출
+    private double coordinate(OcrApiResponse.Field field, boolean xAxis) {
+        if (field.boundingPoly() == null
+                || field.boundingPoly().vertices() == null
+                || field.boundingPoly().vertices().isEmpty()) {
+            return 0;
+        }
+        OcrApiResponse.Vertex vertex = field.boundingPoly().vertices().getFirst();
+        Double coordinate = xAxis ? vertex.x() : vertex.y();
+        return coordinate == null ? 0 : coordinate;
     }
 
     // 빈 파일, 용량 초과, 지원하지 않는 형식을 검증
