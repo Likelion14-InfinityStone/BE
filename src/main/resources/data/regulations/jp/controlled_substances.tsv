@@ -1,0 +1,358 @@
+# verified_date=2024-12-12
+substance_name	category_code	prohibited
+[(3-methyl-4-morpholino-2,2-diphenyl)putyryl]piroridine	N	false
+1,1-Dimethyl 2-methyl-3-phenyloxirane-2-carboxylate	SRM	false
+1-methyl-4-phenylpiperidine-4-carboxylic acid ester (Ex. Pethidine, Properidine)	N	false
+1-Methylethyl 2-methyl-3-phenyloxirane-2-carboxylate	SRM	false
+1-Methylpropyl 2-methyl-3-phenyloxirane-2-carboxylate	SRM	false
+25B-NBOMe	N	false
+25I-NBOMe	N	false
+2C-B	N	false
+2C-C-NBOMe(25C-NBOMe)	N	false
+2C-I	N	false
+2C-T-2	N	false
+2C-T-4	N	false
+2C-T-7	N	false
+2-Fluorodeschloroketamine	N	false
+2-Fluorofentanyl,ortho-fluorofentanyl,o-fluorofentanyl	N	false
+2-Methyl-3-phenyloxirane-2-carboxylic acid	SRM	false
+2-Methyl-AP-237	N	false
+2-Methylpropyl 2-methyl-3-phenyloxirane-2-carboxylate	SRM	false
+3-CMC	N	false
+3CPP	N	false
+3-hydroxymorphinan (other than dextrorotatory one)	N	false
+3-hydroxy-N-methylmorphinan (other than dextrorotatory one)	N	false
+3-hydroxy-N-phenacylmorphinan (other than dextrorotatory one)	N	false
+3-MeO-PCP	N	false
+3-methoxy-N-methylmorphinan (other than dextrorotatory one)	N	false
+3-Methylfentanyl	N	false
+3-Methylmethcathinone,3-MMC	N	false
+3-Methylthiofentanil	N	false
+4,4'-DMAR	N	false
+4-CMC	N	false
+4-FA,4FMP,4-Fluoroamphetamine,p-Fluoroamphetamine	N	false
+4-FBF, p-FBF	N	false
+4-FIBF, p-FIBF, 4-Fluoroisobutyryl fentanyl	N	false
+4F-MDMB-BINACA	N	false
+4-MEC，4-Methylethcathinone	N	false
+4-Methylaminorex	N	false
+4-Methylmethcathinone	N	false
+4-MTA (4-Methylthioamphetamine)	N	false
+5F-ADB,5F-MDMB-PINACA,MDMB2201 indazole analog	N	false
+5-Fluoro-AMB	N	false
+5F-MDMB-PICA	N	false
+5F-QUPIC	N	false
+5-MeO-DALT	N	false
+5-MeO-DIPT	N	false
+AB-CHMINACA	N	false
+AB-FUBINACA	N	false
+AB-PINACA	N	false
+Acethylmetadol	N	false
+Acetorphine	N	false
+Acetylfentanyl	N	false
+Acetyl-α-methylfentanyl	N	false
+Acrylfentanyl, Acryloylfentanyl	N	false
+ADB-BUTINACA	N	false
+ADB-CHMINACA	N	false
+ADB-FUBINACA	N	false
+AH-7921	N	false
+Alfentanil	N	false
+Allobarbital	P	false
+Allylprodine	N	false
+Alprazolam	P	false
+AM2201	N	false
+Amfepramone	P	false
+Amineptine	N	false
+Aminorex	P	false
+Amobarbital	P	false
+Amphetamine, Phenylaminopropane (INN:Dexamphetamine, Levamfetamine)	S	true
+AMT	N	false
+Anileridine	N	false
+APINACA N-(5-fluoropentyl) derivative	N	false
+Barbital	P	false
+Benzethidine	N	false
+Benzfetamine	P	false
+Bezitramide	N	false
+bk-MDEA	N	false
+Brolamfetamine (DOB)	N	false
+Bromazepam	P	false
+Bromazolam	P	false
+Brorphine	N	false
+Brotizolam	P	false
+Buprenorphine	P	false
+Butalbital	P	false
+Butobarbital	P	false
+Butonitazene	N	false
+Butyl 2-methyl-3-phenyloxirane-2-carboxylate	SRM	false
+Butyrlfentanyl	N	false
+BZP	N	false
+Camazepam	P	false
+Cannabicyclohexanol	N	false
+Cannabis (Has the shape of a cannabis plant) (whole plant, flower spike, leaf)	C, N	true
+Cannabis(Does't have the shape of a cannabis plant)	N	false
+Carfentanil, Carfentanyl,4-Carbomethoxyfentanyl	N	false
+Cathine	P	false
+Cathinone	N	false
+Chlordiazepoxide	P	false
+Chloroephedrine, Chloropseudoephedrine	SRM	false
+Chloromethylephedrine, Chloromethylpseudoephedrine	SRM	false
+Clobazam	P	false
+Clonazepam	P	false
+Clonazolam	P	false
+Clonitazene	N	false
+Clorazepate	P	false
+Clotiazepam	P	false
+Cloxazolam	P	false
+Coca leaf **	N	false
+Cocaine, other ecgonine ester	N	false
+Codeine, Ethylmorphine, other morphine ether (*Any substances containing 1% or less of codeine or its salt are excluded.)	N	false
+Codoxime	N	false
+Crotonylfentanyl	N	false
+CUMYL-4CN-BINACA,4-cyano CUMYL-BUTINACA, SGT-78	N	false
+CUMYL-PEGACLONE	N	false
+Cyclobarbital	P	false
+Cyclopropylfentanyl	N	false
+Delorazepam	P	false
+Demethylmorphine, its ether	N	false
+Desomorphine, its ester	N	false
+DET(N,N-dietyltryptamine)	N	false
+Diampromide	N	false
+Diazepam	P	false
+Diclazepam	P	false
+Diethylthienebutene	N	false
+Difenoxin	N	false
+Dihydrocodeine, its ester (*Any substances containing 1% or less of dihydrocodeine or its salt are excluded.)	N	false
+Dihydroetorphine	N	false
+Dihydromorphine, its ester	N	false
+Dimenoxadol	N	false
+Dimepheptanol	N	false
+Dimethylpropamine	SRM	false
+Dimethylthiambutene	N	false
+Dioxaphetyl putyrate	N	false
+Dipentylone	N	false
+Diphenidine	N	false
+Diphenoxylate	N	false
+Dipipanone	N	false
+DMA(2,5-Dimethoxyamphetamine)	N	false
+DMHP(Dimethylheptylpyran)	N	false
+DMT(N,N-dimethyltryptamine)	N	false
+DOC	N	false
+DOET(2,5-Dimethoxy-4-ethylamphetamine)	N	false
+DOM(2,5-Dimethoxy-4-methylamphetamine)	N	false
+Drotebanol (Oxymethebanol)	N	false
+Ecgonine	N	false
+Ephedrine, Pseudoephedrine (*Any substances containing 10% or less of ephedrine or pseudoephedrine are excluded.)	SRM	false
+Estazolam	P	false
+Etazene,Etodesnitazene	N	false
+Ethcathinone	N	false
+Ethchlorvynol	P	false
+Ethinamate	P	false
+Ethyl 2-methyl-3-phenyloxirane-2-carboxylate	SRM	false
+Ethylloflazepate	P	false
+Ethylmethylthiambutene	N	false
+Ethylphenidate	N	false
+Eticyclidine	N	false
+Etilamfetamine	P	false
+Etizolam	P	false
+Etonitazene	N	false
+Etonitazepyne,N-Pyrrolidino Etonitazene	N	false
+Etorphine	N	false
+Etoxyeridine	N	false
+Etryptamine	N	false
+Eutylone，bk-EBDB	N	false
+Fencamfamine	P	false
+Fenetylline	P	false
+Fenproporex	P	false
+Fentanyl	N	false
+Flualprazolam	P	false
+Flubromazolam	P	false
+Fludiazepam	P	false
+Flunitrazepam	P	false
+Flurazepam	P	false
+FUB-AMB, MMB-FUBINACA, AMB-FUBINACA	N	false
+Furanylfentanyl	N	false
+Furethidine	N	false
+GHB(γ-Hydroxybutyric acid)	N	false
+Glutethimide	P	false
+Halazepam	P	false
+Haloxazolam	P	false
+Heroin, other morphine ester	N	true
+Hydrocodone, its ester	N	false
+Hydromorphinol	N	false
+Hydromorphone, its ester	N	false
+Hydroxypethidine	N	false
+Isomethadone	N	false
+Isotonitazene	N	false
+JWH-018	N	false
+JWH-073	N	false
+JWH-122	N	false
+Ketamine	N	false
+Ketazolam	P	false
+Ketobemidone	N	false
+Lefetamine	P	false
+Lisdexamfetamine	SRM	false
+Loprazolam	P	false
+Lorazepam	P	false
+Lormetazepam	P	false
+Lysergide(Lysergic acid diethylamide,LSD,LSD-25)	N	false
+MAM-2201	N	false
+Mazindol	P	false
+MBDB	N	false
+MDA (3,4-Methylenedioxyamphetamine)	N	false
+MDMA(3,4-Methylenedioxymethamphetamine)	N	false
+MDMB-4en-PINACA	N	false
+MDMB-CHIMICA、MMB-CHMINACA	N	false
+MDPV	N	false
+Mecloqualone	P	false
+Medazepam	P	false
+Mefenorex	P	false
+Meprobamate	P	false
+Mescaline	N	false
+Mesocarb	P	false
+Metazocine	N	false
+Methadone intermediate	N	false
+Methadone (It is prohibited to import or export in case of which you take Methadone for treating substance use disorders. )	N	false
+Methamphetamine, Phenylmethylaminopropane	S	true
+Methaqualone	P	true
+Methcathinone	N	false
+Methiopropamine	N	false
+Methoxetamine	N	false
+Methoxyacetylfentanyl	N	false
+Methyl 2-methyl-3-phenyloxirane-2-carboxylate	SRM	false
+Methyl α-phenylacetoacetate,MAPA	SRM	false
+Methyldihydromorphine	N	false
+Methylephedrine, Methylpseudoephedrine (*Any substances containing 10% or less of methylephedrine are excluded.)	SRM	false
+Methylone	N	false
+Methylphenidate	P	false
+Methylphenobarbital	P	false
+Methyprylon	P	false
+Metonitazene	N	false
+Metopon, its ester	N	false
+Metyldesorphine	N	false
+Midazolam	P	false
+MMDA(5-Methoxy-3,4-methylenedioxyamphetamin)	N	false
+Modafinil	P	false
+Moramido intermediate	N	false
+Morpheridine	N	false
+Morphine	N	false
+Morphine-N-oxydo, other pentavalent nitrogen morphine, and its derivatives **	N	false
+MPPP	N	false
+MT-45	N	false
+Nalorphine, its ester	N	false
+N-Ethyl MDA(N-Ethylmethylenedioxyamphetamine)	N	false
+N-Ethylhexedrone	N	false
+N-Ethylnorpentylone, ephylone, bk-EPDP	N	false
+Ｎ-Hydroxy MDA(N-Hydroxy-3,4-methylenedioxyamphetamine)	N	false
+Ｎ-Hydroxy MDMA,Ｎ-OH MDMA,FLEA	N	false
+Nicocodine	N	false
+Nimetazepam	P	false
+Nitrazepam	P	false
+Noracymethadole	N	false
+Nordazepam	P	false
+Norephedrine, Phenylpropanolamine (*Any substances containing 50% or less of norephedrine or phenylpropanolamine are excluded.)	SRM	false
+Normesadone	N	false
+Norpipanone	N	false
+Ocfentanil, A-3217	N	false
+Opium (INN:Opium powder, Opium tincture)	O	true
+Oripavine	N	false
+Oxazepam	P	false
+Oxazolam	P	false
+Oxycodone, its ester	N	false
+Oxymorphone**	N	false
+Parahexyl	N	false
+Pemoline	P	false
+Pentazocine	P	false
+Pentedrone	N	false
+Pentobarbital	P	false
+PEPAP	N	false
+Pethidine intermediate A	N	false
+Pethidine intermediate B	N	false
+Pethidine intermediate C	N	false
+p-Fluorofentanyl	N	false
+Phenadoxone	N	false
+Phenanpromid	N	false
+Phenazepam	P	false
+Phenazocine	N	false
+Phencyclidine (PCP)	N	false
+Phendimetrazine	P	false
+Phenmetrazine	P	false
+Phenobarbital	P	false
+Phenomorphan	N	false
+Phenoperidine	N	false
+Phentermine	P	false
+Phenylacetic acid (*Any substances containing 10% or less of phenylacetic acid are excluded.)	SRM	false
+Phenylacetoacetonitrile **	SRM	false
+Phenylacetone **	SRM	false
+Piminodine	N	false
+Pinazepam	P	false
+Pipradrol	P	false
+Piritramide	N	false
+PMA (p-Methoxyamphetamine)	N	false
+PMMA	N	false
+Prazepam	P	false
+Proheptazine	N	false
+Propiram	N	false
+Propoxyphene	N	false
+Propyl 2-methyl2-phenyloxirane-2-carboxylate	SRM	false
+Propylhexedrine	P	false
+Protonitazene	N	false
+Psilocin	N	false
+Psilocybin	N	false
+Pyrovalerone	P	false
+Quazepam	P	false
+Remifentanil	N	false
+Remimazolam	P	false
+Rolicyclidine	N	false
+Secbutabarbital	P	false
+Secobarbital	P	false
+Selegiline, Deprenyl	SRM	false
+Sufentanil	N	false
+Tapentadol	N	false
+Temazepam	P	false
+Tenocyclidine	N	false
+Tetrazepam	P	false
+TFMPP	N	false
+THCA	N	false
+Thebaine	N	false
+THF-F,THF-fentanyl,Tetrahydrofuranyl fentanyl	N	false
+Thiofentanyl	N	false
+Tilidine	N	false
+TMA(3,4,5-Trimethoxyamphetamine)	N	false
+TMA-2	N	false
+Triazolam	P	false
+Trimeperidine	N	false
+Ｕ-47700	N	false
+UR-144	N	false
+Valerylfentanyl	N	false
+Vinylbital	P	false
+XLR-11	N	false
+Zipeprol	P	false
+Zolpidem	P	false
+Zopiclone	P	false
+α-acethylmetadol	N	false
+α-meprodine	N	false
+α-methadol	N	false
+α-Methylfentanyl	N	false
+α-methylthiofentanil	N	false
+α-phenylacetoacetamide,APAA	SRM	false
+α-PHP	N	false
+α-PiHP,α-PHiP	N	false
+α-prodine	N	false
+α-PVP	N	false
+β-acethylmetadol	N	false
+β-Hydroxy-3-methylfentanyl	N	false
+β-hydroxyfentanil	N	false
+β-meprodine	N	false
+β-methadol	N	false
+β-prodine	N	false
+Δ10 THC	N	false
+Δ6a(10a) THC	N	false
+Δ6a(7) THC	N	false
+Δ7 THC	N	false
+Δ8 THC	N	false
+Δ8-THCO	N	false
+Δ8-THCOP	N	false
+Δ9 THC	N	false
+Δ9(11) THC	N	false
+Δ9-THCO	N	false
+Δ9-THCOP	N	false
