@@ -28,7 +28,8 @@ public class MedicationCandidateController {
      */
     @Operation(
             summary = "제품명으로 식약처 의약품 재매칭",
-            description = "OCR 자동 매칭 실패 또는 사용자가 제품명을 수정한 경우 식약처 의약품을 다시 조회하고, 검색 결과의 첫 번째 제품을 매칭합니다."
+            description = "향후 제품명 수정 기능에서 식약처 의약품을 재검색하기 위한 확장용 API입니다. "
+                    + "검색 결과가 여러 건이면 MVP 정책에 따라 첫 번째 제품을 반환합니다."
     )
     @GetMapping("/candidates")
     public ApiResponse<MedicationCandidateSearchResponse> searchCandidates(

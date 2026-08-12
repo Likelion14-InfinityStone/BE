@@ -42,16 +42,16 @@ public class MedicationScanService {
                 .matchedProduct();
 
         /*
-         * 프론트에는 후속 약 등록에 필요한 품목코드와 화면 표시용 한글 제품명만 노출한다.
-         * 그 외 식약처 상세정보는 MfdsClient 내부 응답에 유지하여
-         * 추후 여행 도메인에서 필요할 때 재사용한다.
-         * 식약처 검색 결과가 없으면 사용자가 인식 결과 화면에서 수정할 수 있도록
-         * 한글 제품명에 OCR 원문을 대신 담는다.
+         * 식약처에서 최초 조회한 제품 식별정보를 프론트가 최종 저장 요청에
+         * 그대로 포함할 수 있도록 품목코드와 한글 제품명을 함께 반환한다.
+         * 식약처 검색 결과가 없으면 두 공식 제품정보를 모두 null로 반환한다.
+         * 프론트는 mfdsProductCode가 null인 항목에 인식 실패 및 재촬영 안내를 표시하고,
+         * 해당 항목이 포함된 상태에서는 최종 저장을 진행하지 않는다.
          */
         return new ScannedMedication(
                 medication.ocrProductText(),
                 matchedProduct == null ? null : matchedProduct.mfdsProductCode(),
-                matchedProduct == null ? medication.ocrProductText() : matchedProduct.productKoName(),
+                matchedProduct == null ? null : matchedProduct.productKoName(),
                 medication.intakesPerDay(),
                 medication.totalDays(),
                 medication.dosePerIntake(),
