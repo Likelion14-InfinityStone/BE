@@ -24,7 +24,7 @@ public class MedicationScanController {
 
     @Operation(
             summary = "약 봉투 인식",
-            description = "약 봉투 이미지에서 조제 및 복용 정보를 추출하고 구조화하여 반환합니다."
+            description = "약 봉투 이미지에서 조제 및 복용 정보를 추출하고, OCR 제품명을 식약처 의약품과 자동 매칭하여 반환합니다. 복용 정보가 인식되지 않으면 해당 필드는 null로 반환됩니다."
     )
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ApiResponse<MedicationScanResponse> scan(

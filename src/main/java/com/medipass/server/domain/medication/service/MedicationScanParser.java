@@ -158,7 +158,9 @@ public class MedicationScanParser {
             }
             ReceiptDosage dosage = matchedDosage == null ? ReceiptDosage.empty() : matchedDosage;
             medications.add(new ScannedMedication(
-                    productField.text(),
+                    productField.text(), // 응답에는 노출하지 않고 식약처 자동 매칭에만 사용
+                    null,
+                    null,
                     dosage.intakesPerDay(),
                     dosage.totalDays(),
                     dosage.dosePerIntake(),
