@@ -1,6 +1,7 @@
 package com.medipass.server.domain.medication.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.medipass.server.domain.medication.entity.DoseUnit;
 
 import java.math.BigDecimal;
 
@@ -11,6 +12,6 @@ public record ScannedMedication(
         Integer intakesPerDay,
         Integer totalDays,
         BigDecimal dosePerIntake,
-        String doseUnit
+        DoseUnit doseUnit
 ) {
 }

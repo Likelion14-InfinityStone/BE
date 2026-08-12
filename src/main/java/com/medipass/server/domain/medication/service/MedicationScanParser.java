@@ -2,6 +2,7 @@ package com.medipass.server.domain.medication.service;
 
 import com.medipass.server.domain.medication.dto.response.MedicationScanResponse;
 import com.medipass.server.domain.medication.dto.response.ScannedMedication;
+import com.medipass.server.domain.medication.entity.DoseUnit;
 import com.medipass.server.global.ocr.dto.OcrTextField;
 import com.medipass.server.global.ocr.dto.OcrTextResult;
 import org.springframework.stereotype.Component;
@@ -282,13 +283,13 @@ public class MedicationScanParser {
         }
     }
 
-    private String inferDoseUnit(String product) {
+    private DoseUnit inferDoseUnit(String product) {
         // OCR 제품명의 제형 표현을 API enum 값으로 변환
         if (product.contains("캡슐")) {
-            return "CAPSULE";
+            return DoseUnit.CAPSULE;
         }
         if (product.contains("정") || product.contains("서방")) {
-            return "TABLET";
+            return DoseUnit.TABLET;
         }
         return null;
     }
