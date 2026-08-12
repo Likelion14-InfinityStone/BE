@@ -10,9 +10,16 @@ import com.medipass.server.global.mfds.exception.MfdsErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.regex.Pattern;
+
 @Service
 @RequiredArgsConstructor
 public class MedicationCandidateService {
+
+    private static final Pattern TRAILING_DOSAGE_PATTERN = Pattern.compile(
+            "(?i)\\s*\\d+(?:[.,]\\d+)?\\s*"
+                    + "(?:mg|㎎|밀리그램|밀리그람|g|그램|mcg|μg|㎍|마이크로그램|마이크로그람|ml|㎖|밀리리터)\\s*$"
+    );
 
     private final MfdsClient mfdsClient;
 
@@ -20,6 +27,19 @@ public class MedicationCandidateService {
     public MedicationCandidateSearchResponse search(String ocrProductText) {
         String searchKeyword = normalizeSearchKeyword(ocrProductText);
         MfdsProductSearchResult result = mfdsClient.searchByProductName(searchKeyword);
+
+        /*
+         * 식약처 제품명 검색은 OCR 문자열 끝에 함량이 붙으면 결과가 없을 수 있다.
+         * 1차 검색이 실패한 경우에만 끝의 '숫자 + 용량 단위'를 제거하여 한 번 재검색한다.
+         * '타이레놀8시간이알서방정'처럼 제품명 자체에 포함된 숫자는 제거하지 않는다.
+         */
+        if (result.items().isEmpty()) {
+            String fallbackKeyword = removeTrailingDosage(searchKeyword);
+            if (!fallbackKeyword.equals(searchKeyword)) {
+                searchKeyword = fallbackKeyword;
+                result = mfdsClient.searchByProductName(searchKeyword);
+            }
+        }
 
         /*
          * MVP에서는 별도의 후보 선택 화면을 제공하지 않는다.
@@ -34,6 +54,10 @@ public class MedicationCandidateService {
                 .orElse(null);
 
         return new MedicationCandidateSearchResponse(searchKeyword, result.totalCount(), matchedProduct);
+    }
+
+    private String removeTrailingDosage(String searchKeyword) {
+        return TRAILING_DOSAGE_PATTERN.matcher(searchKeyword).replaceFirst("").trim();
     }
 
     private MedicationCandidateResponse toCandidateResponse(MfdsProductItem item) {
