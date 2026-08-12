@@ -1,7 +1,7 @@
-package com.medipass.server.domain.medication.controller;
+package com.medipass.server.domain.medication.web.controller;
 
-import com.medipass.server.domain.medication.dto.response.MedicationCandidateSearchResponse;
 import com.medipass.server.domain.medication.service.MedicationCandidateService;
+import com.medipass.server.domain.medication.web.dto.MedicationCandidateSearchRes;
 import com.medipass.server.global.response.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -32,7 +32,7 @@ public class MedicationCandidateController {
                     + "검색 결과가 여러 건이면 MVP 정책에 따라 첫 번째 제품을 반환합니다."
     )
     @GetMapping("/candidates")
-    public ApiResponse<MedicationCandidateSearchResponse> searchCandidates(
+    public ApiResponse<MedicationCandidateSearchRes> searchCandidates(
             @Parameter(
                     description = "식약처에서 검색할 제품명",
                     example = "콘서타"

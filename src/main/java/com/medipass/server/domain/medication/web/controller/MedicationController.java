@@ -1,8 +1,8 @@
-package com.medipass.server.domain.medication.controller;
+package com.medipass.server.domain.medication.web.controller;
 
-import com.medipass.server.domain.medication.dto.request.MedicationCreateRequest;
-import com.medipass.server.domain.medication.dto.response.MedicationCreateResponse;
 import com.medipass.server.domain.medication.service.MedicationService;
+import com.medipass.server.domain.medication.web.dto.MedicationCreateReq;
+import com.medipass.server.domain.medication.web.dto.MedicationCreateRes;
 import com.medipass.server.global.jwt.CustomUserDetails;
 import com.medipass.server.global.response.ApiResponse;
 import com.medipass.server.global.response.code.SuccessResponseCode;
@@ -32,11 +32,11 @@ public class MedicationController {
     )
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public ApiResponse<MedicationCreateResponse> create(
+    public ApiResponse<MedicationCreateRes> create(
             @AuthenticationPrincipal CustomUserDetails userDetails,
-            @Valid @RequestBody MedicationCreateRequest request
+            @Valid @RequestBody MedicationCreateReq request
     ) {
-        MedicationCreateResponse response = medicationService.create(
+        MedicationCreateRes response = medicationService.create(
                 userDetails.getUser().getId(),
                 request
         );

@@ -1,7 +1,7 @@
 package com.medipass.server.domain.medication.service;
 
-import com.medipass.server.domain.medication.dto.response.MedicationCandidateResponse;
-import com.medipass.server.domain.medication.dto.response.MedicationCandidateSearchResponse;
+import com.medipass.server.domain.medication.web.dto.MedicationCandidateRecord;
+import com.medipass.server.domain.medication.web.dto.MedicationCandidateSearchRes;
 import com.medipass.server.global.exception.BaseException;
 import com.medipass.server.global.mfds.client.MfdsClient;
 import com.medipass.server.global.mfds.dto.MfdsProductItem;
@@ -24,7 +24,7 @@ public class MedicationCandidateService {
     private final MfdsClient mfdsClient;
 
     // OCR 최초 자동 매칭과 사용자 제품명 수정 후 재매칭에서 공통으로 사용하는 내부 서비스다
-    public MedicationCandidateSearchResponse search(String ocrProductText) {
+    public MedicationCandidateSearchRes search(String ocrProductText) {
         String searchKeyword = normalizeSearchKeyword(ocrProductText);
         MfdsProductSearchResult result = mfdsClient.searchByProductName(searchKeyword);
 
@@ -48,21 +48,21 @@ public class MedicationCandidateService {
          * 검색 결과가 없을 때는 matchedProduct를 null로 내려 프론트에서
          * 직접 입력 또는 재촬영 흐름으로 처리할 수 있도록 한다.
          */
-        MedicationCandidateResponse matchedProduct = result.items().stream()
+        MedicationCandidateRecord matchedProduct = result.items().stream()
                 .findFirst()
                 .map(this::toCandidateResponse)
                 .orElse(null);
 
-        return new MedicationCandidateSearchResponse(searchKeyword, result.totalCount(), matchedProduct);
+        return new MedicationCandidateSearchRes(searchKeyword, result.totalCount(), matchedProduct);
     }
 
     private String removeTrailingDosage(String searchKeyword) {
         return TRAILING_DOSAGE_PATTERN.matcher(searchKeyword).replaceFirst("").trim();
     }
 
-    private MedicationCandidateResponse toCandidateResponse(MfdsProductItem item) {
+    private MedicationCandidateRecord toCandidateResponse(MfdsProductItem item) {
         // 자동 매칭 단계에서는 제품 식별에 필요한 최소 정보만 클라이언트에 반환
-        return new MedicationCandidateResponse(
+        return new MedicationCandidateRecord(
                 item.itemSeq(),
                 item.itemName()
         );

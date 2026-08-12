@@ -1,7 +1,7 @@
-package com.medipass.server.domain.medication.controller;
+package com.medipass.server.domain.medication.web.controller;
 
-import com.medipass.server.domain.medication.dto.response.MedicationScanResponse;
 import com.medipass.server.domain.medication.service.MedicationScanService;
+import com.medipass.server.domain.medication.web.dto.MedicationScanRes;
 import com.medipass.server.global.response.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -29,7 +29,7 @@ public class MedicationScanController {
                     + "복용 정보가 인식되지 않으면 해당 필드는 null로 반환됩니다."
     )
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ApiResponse<MedicationScanResponse> scan(
+    public ApiResponse<MedicationScanRes> scan(
             @Parameter(description = "약 봉투 이미지(JPEG 또는 PNG)", required = true)
             @RequestPart("file") MultipartFile file
     ) {

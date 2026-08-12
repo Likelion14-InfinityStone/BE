@@ -1,9 +1,9 @@
 package com.medipass.server.domain.medication.service;
 
-import com.medipass.server.domain.medication.dto.request.MedicationCreateRequest;
-import com.medipass.server.domain.medication.dto.response.MedicationCreateResponse;
 import com.medipass.server.domain.medication.entity.Medication;
 import com.medipass.server.domain.medication.repository.MedicationRepository;
+import com.medipass.server.domain.medication.web.dto.MedicationCreateReq;
+import com.medipass.server.domain.medication.web.dto.MedicationCreateRes;
 import com.medipass.server.domain.user.entity.User;
 import com.medipass.server.domain.user.repository.UserRepository;
 import com.medipass.server.global.exception.BaseException;
@@ -22,7 +22,7 @@ public class MedicationService {
     private final UserRepository userRepository;
 
     @Transactional
-    public MedicationCreateResponse create(Long userId, MedicationCreateRequest request) {
+    public MedicationCreateRes create(Long userId, MedicationCreateReq request) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new BaseException(
                         ErrorResponseCode.NOT_FOUND_RESOURCE,
@@ -39,13 +39,13 @@ public class MedicationService {
                 .map(item -> toMedication(user, request, item))
                 .toList();
 
-        return MedicationCreateResponse.from(medicationRepository.saveAll(medications));
+        return MedicationCreateRes.from(medicationRepository.saveAll(medications));
     }
 
     private Medication toMedication(
             User user,
-            MedicationCreateRequest request,
-            MedicationCreateRequest.Item item
+            MedicationCreateReq request,
+            MedicationCreateReq.Item item
     ) {
         /*
          * 식약처 API의 중복 호출을 피하기 위해 스캔 단계에서 조회해 프론트에

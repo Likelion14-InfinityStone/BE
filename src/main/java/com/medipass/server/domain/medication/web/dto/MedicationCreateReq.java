@@ -1,4 +1,4 @@
-package com.medipass.server.domain.medication.dto.request;
+package com.medipass.server.domain.medication.web.dto;
 
 import com.medipass.server.domain.medication.entity.DoseUnit;
 import jakarta.validation.Valid;
@@ -12,7 +12,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
-public record MedicationCreateRequest(
+public record MedicationCreateReq(
         LocalDate dispensedAt,
         String issuer,
         @NotEmpty(message = "입력해 주세요")

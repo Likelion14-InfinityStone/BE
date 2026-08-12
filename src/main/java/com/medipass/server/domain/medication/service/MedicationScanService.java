@@ -1,8 +1,8 @@
 package com.medipass.server.domain.medication.service;
 
-import com.medipass.server.domain.medication.dto.response.MedicationScanResponse;
-import com.medipass.server.domain.medication.dto.response.MedicationCandidateResponse;
-import com.medipass.server.domain.medication.dto.response.ScannedMedication;
+import com.medipass.server.domain.medication.web.dto.MedicationCandidateRecord;
+import com.medipass.server.domain.medication.web.dto.MedicationScanRes;
+import com.medipass.server.domain.medication.web.dto.ScannedMedicationRecord;
 import com.medipass.server.global.ocr.client.OcrClient;
 import com.medipass.server.global.ocr.dto.OcrTextResult;
 import lombok.RequiredArgsConstructor;
@@ -17,9 +17,9 @@ public class MedicationScanService {
     private final MedicationScanParser medicationScanParser;
     private final MedicationCandidateService medicationCandidateService;
 
-    public MedicationScanResponse scan(MultipartFile file) {
+    public MedicationScanRes scan(MultipartFile file) {
         OcrTextResult ocrText = ocrClient.extract(file);
-        MedicationScanResponse parsed = medicationScanParser.parse(ocrText);
+        MedicationScanRes parsed = medicationScanParser.parse(ocrText);
 
         /*
          * 프론트가 OCR API와 식약처 매칭 API를 따로 호출하지 않도록
@@ -27,7 +27,7 @@ public class MedicationScanService {
          * 식약처 결과가 여러 건이면 MedicationCandidateService의 MVP 정책에 따라
          * 첫 번째 제품이 선택되고, 결과가 없으면 matchedProduct는 null이 된다.
          */
-        return new MedicationScanResponse(
+        return new MedicationScanRes(
                 parsed.dispensedAt(),
                 parsed.issuer(),
                 parsed.medications().stream()
@@ -36,8 +36,8 @@ public class MedicationScanService {
         );
     }
 
-    private ScannedMedication matchMedication(ScannedMedication medication) {
-        MedicationCandidateResponse matchedProduct = medicationCandidateService
+    private ScannedMedicationRecord matchMedication(ScannedMedicationRecord medication) {
+        MedicationCandidateRecord matchedProduct = medicationCandidateService
                 .search(medication.ocrProductText())
                 .matchedProduct();
 
@@ -48,7 +48,7 @@ public class MedicationScanService {
          * 프론트는 mfdsProductCode가 null인 항목에 인식 실패 및 재촬영 안내를 표시하고,
          * 해당 항목이 포함된 상태에서는 최종 저장을 진행하지 않는다.
          */
-        return new ScannedMedication(
+        return new ScannedMedicationRecord(
                 medication.ocrProductText(),
                 matchedProduct == null ? null : matchedProduct.mfdsProductCode(),
                 matchedProduct == null ? null : matchedProduct.productKoName(),
