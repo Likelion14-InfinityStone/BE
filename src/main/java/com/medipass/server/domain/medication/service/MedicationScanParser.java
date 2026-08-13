@@ -1,7 +1,8 @@
 package com.medipass.server.domain.medication.service;
 
-import com.medipass.server.domain.medication.dto.response.MedicationScanResponse;
-import com.medipass.server.domain.medication.dto.response.ScannedMedication;
+import com.medipass.server.domain.medication.web.dto.MedicationScanRes;
+import com.medipass.server.domain.medication.web.dto.ScannedMedicationRecord;
+import com.medipass.server.domain.medication.entity.DoseUnit;
 import com.medipass.server.global.ocr.dto.OcrTextField;
 import com.medipass.server.global.ocr.dto.OcrTextResult;
 import org.springframework.stereotype.Component;
@@ -25,15 +26,15 @@ public class MedicationScanParser {
             "(20\\d{2})\\s*[년./-]\\s*(\\d{1,2})\\s*[월./-]\\s*(\\d{1,2})\\s*일?"
     );
 
-    public MedicationScanResponse parse(OcrTextResult ocrText) {
+    public MedicationScanRes parse(OcrTextResult ocrText) {
         // OCR 좌표를 행 단위로 묶은 뒤 공통 정보와 약 정보를 추출
         List<Row> rows = groupRows(ocrText.fields(), rowYTolerance(ocrText.imageHeight()));
         LocalDate dispensedAt = findDispensedAt(rows, ocrText.rawText());
         String issuer = findIssuer(rows);
 
-        List<ScannedMedication> medications = findMedications(rows, ocrText.imageWidth());
+        List<ScannedMedicationRecord> medications = findMedications(rows, ocrText.imageWidth());
 
-        return new MedicationScanResponse(dispensedAt, issuer, medications);
+        return new MedicationScanRes(dispensedAt, issuer, medications);
     }
 
     private List<Row> groupRows(List<OcrTextField> fields, double rowYTolerance) {
@@ -111,7 +112,7 @@ public class MedicationScanParser {
         return null;
     }
 
-    private List<ScannedMedication> findMedications(List<Row> rows, Integer actualImageWidth) {
+    private List<ScannedMedicationRecord> findMedications(List<Row> rows, Integer actualImageWidth) {
         double imageWidth = effectiveImageWidth(rows, actualImageWidth);
 
         // 약품사진 영역에 표시된 약만 등록 대상으로 사용
@@ -149,7 +150,7 @@ public class MedicationScanParser {
                 .toList();
 
         // 사진 영역과 영수증 영역의 약 이름을 비교해 복용 정보 연결
-        List<ScannedMedication> medications = new ArrayList<>();
+        List<ScannedMedicationRecord> medications = new ArrayList<>();
         List<ReceiptDosage> unusedDosages = new ArrayList<>(dosages);
         for (OcrTextField productField : photoMedications) {
             ReceiptDosage matchedDosage = findBestDosage(productField.text(), unusedDosages);
@@ -157,8 +158,11 @@ public class MedicationScanParser {
                 unusedDosages.remove(matchedDosage);
             }
             ReceiptDosage dosage = matchedDosage == null ? ReceiptDosage.empty() : matchedDosage;
-            medications.add(new ScannedMedication(
-                    productField.text(),
+            medications.add(new ScannedMedicationRecord(
+                    productField.text(), // 응답에는 노출하지 않고 식약처 자동 매칭에만 사용
+                    null,
+                    null,
+                    null,
                     dosage.intakesPerDay(),
                     dosage.totalDays(),
                     dosage.dosePerIntake(),
@@ -280,13 +284,13 @@ public class MedicationScanParser {
         }
     }
 
-    private String inferDoseUnit(String product) {
+    private DoseUnit inferDoseUnit(String product) {
         // OCR 제품명의 제형 표현을 API enum 값으로 변환
         if (product.contains("캡슐")) {
-            return "CAPSULE";
+            return DoseUnit.CAPSULE;
         }
         if (product.contains("정") || product.contains("서방")) {
-            return "TABLET";
+            return DoseUnit.TABLET;
         }
         return null;
     }
