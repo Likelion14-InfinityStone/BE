@@ -26,6 +26,8 @@ public record MedicationCreateReq(
             @NotBlank(message = "한글 제품명은 필수입니다.")
             String productKoName,
 
+            String productEnName,
+
             @NotNull(message = "입력해 주세요")
             @Positive(message = "복용 횟수는 1 이상이어야 합니다.")
             Integer intakesPerDay,

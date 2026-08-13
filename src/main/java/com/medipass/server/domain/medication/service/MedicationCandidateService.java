@@ -64,7 +64,8 @@ public class MedicationCandidateService {
         // 자동 매칭 단계에서는 제품 식별에 필요한 최소 정보만 클라이언트에 반환
         return new MedicationCandidateRecord(
                 item.itemSeq(),
-                item.itemName()
+                item.itemName(),
+                item.itemEngName()
         );
     }
 

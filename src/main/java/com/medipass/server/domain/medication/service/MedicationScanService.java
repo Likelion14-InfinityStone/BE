@@ -43,8 +43,8 @@ public class MedicationScanService {
 
         /*
          * 식약처에서 최초 조회한 제품 식별정보를 프론트가 최종 저장 요청에
-         * 그대로 포함할 수 있도록 품목코드와 한글 제품명을 함께 반환한다.
-         * 식약처 검색 결과가 없으면 두 공식 제품정보를 모두 null로 반환한다.
+         * 그대로 포함할 수 있도록 품목코드와 한글·영문 제품명을 함께 반환한다.
+         * 식약처 검색 결과가 없으면 공식 제품정보를 모두 null로 반환한다.
          * 프론트는 mfdsProductCode가 null인 항목에 인식 실패 및 재촬영 안내를 표시하고,
          * 해당 항목이 포함된 상태에서는 최종 저장을 진행하지 않는다.
          */
@@ -52,6 +52,7 @@ public class MedicationScanService {
                 medication.ocrProductText(),
                 matchedProduct == null ? null : matchedProduct.mfdsProductCode(),
                 matchedProduct == null ? null : matchedProduct.productKoName(),
+                matchedProduct == null ? null : matchedProduct.productEnName(),
                 medication.intakesPerDay(),
                 medication.totalDays(),
                 medication.dosePerIntake(),

@@ -49,12 +49,13 @@ public class MedicationService {
     ) {
         /*
          * 식약처 API의 중복 호출을 피하기 위해 스캔 단계에서 조회해 프론트에
-         * 반환했던 품목코드와 한글 제품명을 다시 받아 저장한다.
+         * 반환했던 품목코드와 한글·영문 제품명을 다시 받아 저장한다.
          */
         return Medication.create(
                 user,
                 item.mfdsProductCode().trim(),
                 item.productKoName().trim(),
+                trimToNull(item.productEnName()),
                 request.dispensedAt(),
                 trimToNull(request.issuer()),
                 item.intakesPerDay(),

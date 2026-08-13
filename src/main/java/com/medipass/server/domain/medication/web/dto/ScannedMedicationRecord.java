@@ -9,6 +9,7 @@ public record ScannedMedicationRecord(
         @JsonIgnore String ocrProductText,
         String mfdsProductCode,
         String productKoName,
+        String productEnName,
         Integer intakesPerDay,
         Integer totalDays,
         BigDecimal dosePerIntake,

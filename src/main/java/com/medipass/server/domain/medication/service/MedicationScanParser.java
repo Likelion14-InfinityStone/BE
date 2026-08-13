@@ -162,6 +162,7 @@ public class MedicationScanParser {
                     productField.text(), // 응답에는 노출하지 않고 식약처 자동 매칭에만 사용
                     null,
                     null,
+                    null,
                     dosage.intakesPerDay(),
                     dosage.totalDays(),
                     dosage.dosePerIntake(),

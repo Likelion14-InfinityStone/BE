@@ -15,12 +15,14 @@ public record MedicationCreateRes(
 
     public record Item(
             Long medicationId,
-            String productKoName
+            String productKoName,
+            String productEnName
     ) {
         private static Item from(Medication medication) {
             return new Item(
                     medication.getId(),
-                    medication.getProductKoName()
+                    medication.getProductKoName(),
+                    medication.getProductEnName()
             );
         }
     }

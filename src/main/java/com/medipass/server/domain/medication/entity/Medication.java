@@ -59,6 +59,10 @@ public class Medication extends BaseEntity {
     @Column(name = "product_ko_name", nullable = false, length = 300)
     private String productKoName;
 
+    // 영문 제품명, 없으면 null
+    @Column(name = "product_en_name", length = 300)
+    private String productEnName;
+
     // 약 봉투 조제일자
     @Column(name = "dispensed_at")
     private LocalDate dispensedAt;
@@ -88,6 +92,7 @@ public class Medication extends BaseEntity {
             User user,
             String mfdsProductCode,
             String productKoName,
+            String productEnName,
             LocalDate dispensedAt,
             String issuer,
             Integer intakesPerDay,
@@ -99,6 +104,7 @@ public class Medication extends BaseEntity {
                 .user(user)
                 .mfdsProductCode(mfdsProductCode)
                 .productKoName(productKoName)
+                .productEnName(productEnName)
                 .dispensedAt(dispensedAt)
                 .issuer(issuer)
                 .intakesPerDay(intakesPerDay)
