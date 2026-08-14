@@ -1,6 +1,7 @@
 package com.medipass.server.domain.medication.service;
 
 import com.medipass.server.domain.medication.entity.Medication;
+import com.medipass.server.domain.medication.entity.MfdsProduct;
 import com.medipass.server.domain.medication.repository.MedicationRepository;
 import com.medipass.server.domain.medication.web.dto.MedicationCreateReq;
 import com.medipass.server.domain.medication.web.dto.MedicationCreateRes;
@@ -20,6 +21,7 @@ public class MedicationService {
 
     private final MedicationRepository medicationRepository;
     private final UserRepository userRepository;
+    private final MfdsProductService mfdsProductService;
 
     @Transactional
     public MedicationCreateRes create(Long userId, MedicationCreateReq request) {
@@ -48,14 +50,15 @@ public class MedicationService {
             MedicationCreateReq.Item item
     ) {
         /*
-         * 식약처 API의 중복 호출을 피하기 위해 스캔 단계에서 조회해 프론트에
-         * 반환했던 품목코드와 한글·영문 제품명을 다시 받아 저장한다.
+         * 품목코드로 제품 마스터를 확보한다 (있으면 재사용, 없으면 MFDS 1회 조회해 저장).
+         * 제품명·성분·함량은 마스터가 보유하므로 medication 에는 복용 정보와 참조만 남는다.
          */
+        MfdsProduct product = mfdsProductService.getOrCreate(
+                item.mfdsProductCode().trim(), item.productKoName().trim());
+
         return Medication.create(
                 user,
-                item.mfdsProductCode().trim(),
-                item.productKoName().trim(),
-                trimToNull(item.productEnName()),
+                product,
                 request.dispensedAt(),
                 trimToNull(request.issuer()),
                 item.intakesPerDay(),

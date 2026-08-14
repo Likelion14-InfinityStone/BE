@@ -59,7 +59,7 @@ public record TripDetailRes(
             return new MedicationItem(
                     tripMedication.getId(),
                     tripMedication.getMedication().getId(),
-                    tripMedication.getMedication().getProductKoName(),
+                    tripMedication.getMedication().getProduct().getProductKoName(),
                     tripMedication.getCarryDays(),
                     tripMedication.getPreparationLevel()
             );

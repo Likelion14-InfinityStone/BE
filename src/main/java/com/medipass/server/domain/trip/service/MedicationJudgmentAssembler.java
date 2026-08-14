@@ -51,7 +51,7 @@ public class MedicationJudgmentAssembler {
                 : List.of();
 
         return new TripAnalyzeRes.MedicationResult(
-                medication.getId(), medication.getProductKoName(), level, regulated,
+                medication.getId(), medication.getProduct().getProductKoName(), level, regulated,
                 category, categoryName, quantityCondition, requirements);
     }
 

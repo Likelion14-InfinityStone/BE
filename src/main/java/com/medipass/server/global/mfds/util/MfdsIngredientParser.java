@@ -1,4 +1,4 @@
-package com.medipass.server.domain.trip.util;
+package com.medipass.server.global.mfds.util;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;

@@ -21,8 +21,8 @@ public record MedicationCreateRes(
         private static Item from(Medication medication) {
             return new Item(
                     medication.getId(),
-                    medication.getProductKoName(),
-                    medication.getProductEnName()
+                    medication.getProduct().getProductKoName(),
+                    medication.getProduct().getProductEnName()
             );
         }
     }

@@ -19,7 +19,6 @@ import com.medipass.server.domain.trip.repository.ChecklistItemRepository;
 import com.medipass.server.domain.trip.repository.TripMedicationRepository;
 import com.medipass.server.domain.trip.repository.TripRepository;
 import com.medipass.server.domain.trip.util.DosageCalculator;
-import com.medipass.server.domain.trip.util.MfdsIngredientParser;
 import com.medipass.server.domain.trip.web.dto.TripAnalyzeReq;
 import com.medipass.server.domain.trip.web.dto.TripAnalyzeRes;
 import com.medipass.server.domain.trip.web.dto.TripChecklogRes;
@@ -30,8 +29,6 @@ import com.medipass.server.domain.trip.web.dto.TripTitleUpdateRes;
 import com.medipass.server.domain.user.entity.User;
 import com.medipass.server.domain.user.repository.UserRepository;
 import com.medipass.server.global.exception.BaseException;
-import com.medipass.server.global.mfds.client.MfdsClient;
-import com.medipass.server.global.mfds.dto.MfdsProductItem;
 import com.medipass.server.global.response.code.ErrorResponseCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -58,7 +55,6 @@ public class TripService {
     private final RequirementTemplateRepository templateRepository;
     private final RegulationJudgeService judgeService;
     private final MedicationJudgmentAssembler judgmentAssembler;
-    private final MfdsClient mfdsClient;
 
     // ─────────────────────────── 약 선택 (여행 등록 중) ───────────────────────────
 
@@ -129,7 +125,8 @@ public class TripService {
         }
 
         return new TripCreateRes.MedicationResult(
-                tripMedication.getId(), medication.getId(), medication.getProductKoName(), item.preparationLevel());
+                tripMedication.getId(), medication.getId(),
+                medication.getProduct().getProductKoName(), item.preparationLevel());
     }
 
     // ─────────────────────────── 체크로그함 (조회) ───────────────────────────
@@ -232,26 +229,19 @@ public class TripService {
         return title;
     }
 
-    // ─────────────────────────── 성분·총량 (MFDS) ───────────────────────────
+    // ─────────────────────────── 성분·총량 (제품 마스터) ───────────────────────────
 
     /**
-     * 약의 성분 + 총 반입량(mg)을 판정용으로 변환
-     * 단일 성분이고 함량(mg/g) 파싱이 되면 총량을 계산해 넘기고, 그 외는 이름만(양 null → 보수적 판정)
+     * 약의 성분 + 총 반입량(mg)을 판정용으로 변환 — 제품 마스터(성분·함량)에서 읽음 (MFDS 재호출 X)
+     * 단일 성분이고 함량이 있으면 총량을 계산해 넘기고, 그 외는 이름만(양 null → 보수적 판정)
      */
     private List<JudgeReq.Ingredient> resolveIngredients(Medication med, int carryDays) {
-        MfdsProductItem item = mfdsClient.searchByProductName(med.getProductKoName()).items().stream()
-                .filter(it -> med.getMfdsProductCode().equals(it.itemSeq()))
-                .findFirst().orElse(null);
-        if (item == null) {
-            return List.of();
-        }
-
-        List<String> names = MfdsIngredientParser.parseEnglishNames(item.mainIngredientEnglish());
+        List<String> names = med.getProduct().getIngredients();
         if (names.isEmpty()) {
             return List.of();
         }
 
-        BigDecimal mgPerUnit = MfdsIngredientParser.parseContentMg(item.itemEngName());
+        BigDecimal mgPerUnit = med.getProduct().getContentMg();
         BigDecimal totalUnits = DosageCalculator.totalUnits(med.getIntakesPerDay(), med.getDosePerIntake(), carryDays);
 
         if (names.size() == 1 && mgPerUnit != null && totalUnits != null) {
