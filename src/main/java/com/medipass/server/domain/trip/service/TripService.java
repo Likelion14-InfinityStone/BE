@@ -25,6 +25,7 @@ import com.medipass.server.domain.trip.web.dto.TripAnalyzeRes;
 import com.medipass.server.domain.trip.web.dto.TripChecklogRes;
 import com.medipass.server.domain.trip.web.dto.TripCreateReq;
 import com.medipass.server.domain.trip.web.dto.TripCreateRes;
+import com.medipass.server.domain.trip.web.dto.TripDetailRes;
 import com.medipass.server.domain.trip.web.dto.TripTitleUpdateRes;
 import com.medipass.server.domain.user.entity.User;
 import com.medipass.server.domain.user.repository.UserRepository;
@@ -162,6 +163,16 @@ public class TripService {
                 .toList();
 
         return new TripChecklogRes(countries, selected, items);
+    }
+
+    // ─────────────────────────── 상세 (여행 티켓) ───────────────────────────
+
+    // 여행 상세 — 여행 카드 + 담긴 약(신호등) 목록
+    @Transactional(readOnly = true)
+    public TripDetailRes getTrip(Long userId, Long tripId) {
+        Trip trip = loadOwnedTrip(userId, tripId);
+        List<TripMedication> medications = tripMedicationRepository.findByTrip_Id(tripId);
+        return TripDetailRes.from(trip, medications, LocalDate.now());
     }
 
     // ─────────────────────────── 이름 수정 ───────────────────────────

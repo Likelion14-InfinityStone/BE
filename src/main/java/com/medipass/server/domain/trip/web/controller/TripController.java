@@ -7,6 +7,7 @@ import com.medipass.server.domain.trip.web.dto.TripAnalyzeRes;
 import com.medipass.server.domain.trip.web.dto.TripChecklogRes;
 import com.medipass.server.domain.trip.web.dto.TripCreateReq;
 import com.medipass.server.domain.trip.web.dto.TripCreateRes;
+import com.medipass.server.domain.trip.web.dto.TripDetailRes;
 import com.medipass.server.domain.trip.web.dto.TripTitleUpdateReq;
 import com.medipass.server.domain.trip.web.dto.TripTitleUpdateRes;
 import com.medipass.server.global.jwt.CustomUserDetails;
@@ -68,6 +69,15 @@ public class TripController {
             @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
         return ApiResponse.success(tripService.selectableMedications(userDetails.getUser().getId()));
+    }
+
+    // 여행 상세 — 여행 티켓 눌렀을 때, 카드 + 담긴 약(신호등) 목록
+    @GetMapping("/{tripId}")
+    public ApiResponse<TripDetailRes> detail(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @PathVariable Long tripId
+    ) {
+        return ApiResponse.success(tripService.getTrip(userDetails.getUser().getId(), tripId));
     }
 
     // 여행 이름 수정 — 같은 사용자 안에서 이름 겹치면 409
