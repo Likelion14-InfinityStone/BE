@@ -45,13 +45,35 @@ public class TripMedication {
     @Column(name = "preparation_level", nullable = false)
     private PreparationLevel preparationLevel;
 
-    // 여정에 챙길 약 한 건 — 일수와 판정 결과(신호등)로
-    public static TripMedication of(Trip trip, Medication medication, Integer carryDays, PreparationLevel preparationLevel) {
+    // 통제 성분 포함 여부 (판정 스냅샷)
+    @Column(name = "regulated", nullable = false, columnDefinition = "boolean default false")
+    private boolean regulated;
+
+    // 분류 코드 (N/P/SRM) — 규제 없으면 null
+    @Column(name = "category_code", length = 50)
+    private String categoryCode;
+
+    // 분류 표시명 (마약류/향정신성의약품/각성제 원료) — 규제 없으면 null
+    @Column(name = "category_name")
+    private String categoryName;
+
+    // 수량 조건 (예: "최대 2160mg · 30일분") — 규제 없으면 null
+    @Column(name = "quantity_condition")
+    private String quantityCondition;
+
+    // 여정에 챙길 약 한 건 — 일수 + analyze 판정 스냅샷(신호등·통제여부·분류·수량조건)
+    public static TripMedication of(Trip trip, Medication medication, Integer carryDays,
+                                    PreparationLevel preparationLevel, boolean regulated,
+                                    String categoryCode, String categoryName, String quantityCondition) {
         return TripMedication.builder()
                 .trip(trip)
                 .medication(medication)
                 .carryDays(carryDays)
                 .preparationLevel(preparationLevel)
+                .regulated(regulated)
+                .categoryCode(categoryCode)
+                .categoryName(categoryName)
+                .quantityCondition(quantityCondition)
                 .build();
     }
 }

@@ -63,7 +63,14 @@ public record TripCreateReq(
             Integer carryDays,
 
             @NotNull(message = "판정 결과(신호등)는 필수입니다")
-            PreparationLevel preparationLevel,   // analyze 응답의 level
+            PreparationLevel preparationLevel,   // analyze 응답의 preparationLevel
+
+            @NotNull(message = "통제 성분 포함 여부는 필수입니다")
+            Boolean regulated,                   // analyze 응답 (통제 성분 포함 여부)
+
+            String categoryCode,                 // analyze 응답 (규제 없으면 null)
+            String categoryName,                 // analyze 응답 (규제 없으면 null)
+            String quantityCondition,            // analyze 응답 (규제 없으면 null)
 
             List<Long> requirementTemplateIds    // analyze 응답의 서류 templateId 들 (없으면 빈 배열)
     ) {

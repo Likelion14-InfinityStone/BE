@@ -115,9 +115,10 @@ public class TripService {
     private TripCreateRes.MedicationResult saveTripMedication(Trip trip, Long userId, TripCreateReq.MedicationItem item) {
         Medication medication = loadOwnedMedication(userId, item.medicationId());
 
-        // analyze 결과(신호등) 그대로 저장
+        // analyze 판정 스냅샷 그대로 저장 (신호등·통제여부·분류·수량조건)
         TripMedication tripMedication = tripMedicationRepository.save(
-                TripMedication.of(trip, medication, item.carryDays(), item.preparationLevel()));
+                TripMedication.of(trip, medication, item.carryDays(), item.preparationLevel(),
+                        item.regulated(), item.categoryCode(), item.categoryName(), item.quantityCondition()));
 
         // analyze 가 준 서류 templateId 로 체크리스트 생성
         if (item.requirementTemplateIds() != null) {
