@@ -1,6 +1,7 @@
 package com.medipass.server.domain.medication.service;
 
 import com.medipass.server.domain.medication.entity.MfdsProduct;
+import com.medipass.server.domain.medication.exception.MedicationProductNotFoundException;
 import com.medipass.server.domain.medication.repository.MfdsProductRepository;
 import com.medipass.server.global.exception.BaseException;
 import com.medipass.server.global.mfds.client.MfdsClient;
@@ -36,8 +37,7 @@ public class MfdsProductService {
         MfdsProductItem item = mfdsClient.searchByProductName(productNameForSearch).items().stream()
                 .filter(it -> mfdsProductCode.equals(it.itemSeq()))
                 .findFirst()
-                .orElseThrow(() -> new BaseException(ErrorResponseCode.NOT_FOUND_RESOURCE,
-                        "식약처에서 제품 정보를 찾을 수 없습니다."));
+                .orElseThrow(MedicationProductNotFoundException::new);
 
         if (item.itemEngName() == null || item.itemEngName().isBlank()) {
             throw new BaseException(ErrorResponseCode.NOT_FOUND_RESOURCE,

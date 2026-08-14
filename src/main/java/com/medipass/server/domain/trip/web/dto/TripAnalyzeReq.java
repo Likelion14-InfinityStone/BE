@@ -1,5 +1,6 @@
 package com.medipass.server.domain.trip.web.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
@@ -21,6 +22,7 @@ public record TripAnalyzeReq(
         @Valid
         List<Item> medications
 ) {
+    @Schema(name = "TripAnalyzeItem")
     public record Item(
 
             @NotNull(message = "복약카드 id는 필수입니다")

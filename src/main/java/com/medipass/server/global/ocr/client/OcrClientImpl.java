@@ -7,6 +7,7 @@ import com.medipass.server.global.ocr.dto.OcrApiResponse;
 import com.medipass.server.global.ocr.dto.OcrTextField;
 import com.medipass.server.global.ocr.dto.OcrTextResult;
 import com.medipass.server.global.ocr.exception.OcrErrorCode;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatusCode;
@@ -27,6 +28,7 @@ import tools.jackson.core.JacksonException;
 import tools.jackson.databind.ObjectMapper;
 
 @Component
+@Slf4j
 public class OcrClientImpl implements OcrClient {
 
     private static final String SECRET_HEADER = "X-OCR-SECRET";
@@ -121,7 +123,14 @@ public class OcrClientImpl implements OcrClient {
         }
 
         OcrApiResponse.ImageResult image = response.images().getFirst();
+        if ("FAILURE".equalsIgnoreCase(image.inferResult())) {
+            log.warn("OCR 이미지 인식 실패: inferResult={}, message={}",
+                    image.inferResult(), image.message());
+            throw new BaseException(OcrErrorCode.OCR_NOT_RECOGNIZED);
+        }
         if (!"SUCCESS".equalsIgnoreCase(image.inferResult())) {
+            log.warn("OCR 이미지 처리 오류: inferResult={}, message={}",
+                    image.inferResult(), image.message());
             throw new BaseException(OcrErrorCode.OCR_SERVICE_ERROR);
         }
         if (image.fields() == null || image.fields().isEmpty()) {
