@@ -3,8 +3,10 @@ package com.medipass.server.domain.medication.service;
 import com.medipass.server.domain.medication.web.dto.MedicationCandidateRecord;
 import com.medipass.server.domain.medication.web.dto.MedicationScanRes;
 import com.medipass.server.domain.medication.web.dto.ScannedMedicationRecord;
+import com.medipass.server.global.exception.BaseException;
 import com.medipass.server.global.ocr.client.OcrClient;
 import com.medipass.server.global.ocr.dto.OcrTextResult;
+import com.medipass.server.global.ocr.exception.OcrErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -20,6 +22,9 @@ public class MedicationScanService {
     public MedicationScanRes scan(MultipartFile file) {
         OcrTextResult ocrText = ocrClient.extract(file);
         MedicationScanRes parsed = medicationScanParser.parse(ocrText);
+        if (parsed.medications().isEmpty()) {
+            throw new BaseException(OcrErrorCode.OCR_NOT_RECOGNIZED);
+        }
 
         /*
          * 프론트가 OCR API와 식약처 매칭 API를 따로 호출하지 않도록
