@@ -3,6 +3,7 @@ package com.medipass.server.domain.trip.web.controller;
 import com.medipass.server.domain.trip.service.TripService;
 import com.medipass.server.domain.trip.web.dto.TripAnalyzeReq;
 import com.medipass.server.domain.trip.web.dto.TripAnalyzeRes;
+import com.medipass.server.domain.trip.web.dto.TripChecklogRes;
 import com.medipass.server.domain.trip.web.dto.TripCreateReq;
 import com.medipass.server.domain.trip.web.dto.TripCreateRes;
 import com.medipass.server.global.jwt.CustomUserDetails;
@@ -12,8 +13,10 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
@@ -43,5 +46,14 @@ public class TripController {
     ) {
         TripCreateRes response = tripService.createTrip(userDetails.getUser().getId(), request);
         return ApiResponse.success(SuccessResponseCode.SUCCESS_CREATED, response);
+    }
+
+    // 체크로그함 — 국가 칩(최신순) + 선택 국가(기본=최신)의 여행 목록
+    @GetMapping("/checklog")
+    public ApiResponse<TripChecklogRes> checklog(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @RequestParam(name = "country", required = false) String country
+    ) {
+        return ApiResponse.success(tripService.checklog(userDetails.getUser().getId(), country));
     }
 }

@@ -18,6 +18,7 @@ import com.medipass.server.domain.trip.util.DosageCalculator;
 import com.medipass.server.domain.trip.util.MfdsIngredientParser;
 import com.medipass.server.domain.trip.web.dto.TripAnalyzeReq;
 import com.medipass.server.domain.trip.web.dto.TripAnalyzeRes;
+import com.medipass.server.domain.trip.web.dto.TripChecklogRes;
 import com.medipass.server.domain.trip.web.dto.TripCreateReq;
 import com.medipass.server.domain.trip.web.dto.TripCreateRes;
 import com.medipass.server.domain.user.entity.User;
@@ -31,8 +32,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -110,6 +115,40 @@ public class TripService {
 
         return new TripCreateRes.MedicationResult(
                 tripMedication.getId(), medication.getId(), medication.getProductKoName(), item.preparationLevel());
+    }
+
+    // ─────────────────────────── 체크로그함 (조회) ───────────────────────────
+
+    // 상단 국가 칩(최신 등록국이 앞) + 선택 국가(기본=최신)의 여행(출국일 빠른 순)
+    @Transactional(readOnly = true)
+    public TripChecklogRes checklog(Long userId, String countryCode) {
+        List<Trip> trips = tripRepository.findByUser_IdOrderByCreatedAtDesc(userId);
+        LocalDate today = LocalDate.now();
+
+        // createdAt desc 순회 → 도착국 첫 등장 순서가 곧 최신순 (칩 목록)
+        Map<String, Country> chipByCode = new LinkedHashMap<>();
+        for (Trip trip : trips) {
+            chipByCode.putIfAbsent(trip.getDestinationCountry().getCode(), trip.getDestinationCountry());
+        }
+        List<TripChecklogRes.CountryChip> countries = chipByCode.values().stream()
+                .map(TripChecklogRes.CountryChip::from)
+                .toList();
+
+        // 선택 국가 — 요청값이 있으면 그 국가, 없으면 최신(첫 칩)
+        String selected = (countryCode != null && !countryCode.isBlank())
+                ? countryCode.toUpperCase()
+                : (countries.isEmpty() ? null : countries.get(0).countryCode());
+
+        // 다가오는 여행(dday>=0) 먼저 가까운 순, 지난 여행(dday<0)은 아래로 최근 지난 순
+        List<TripChecklogRes.TripItem> items = trips.stream()
+                .filter(trip -> trip.getDestinationCountry().getCode().equals(selected))
+                .map(trip -> TripChecklogRes.TripItem.from(trip, today))
+                .sorted(Comparator
+                        .comparing((TripChecklogRes.TripItem t) -> t.dday() < 0)
+                        .thenComparingLong(t -> Math.abs(t.dday())))
+                .toList();
+
+        return new TripChecklogRes(countries, selected, items);
     }
 
     // ─────────────────────────── 공통 ───────────────────────────
