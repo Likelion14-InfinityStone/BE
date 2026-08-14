@@ -5,6 +5,8 @@ import com.medipass.server.domain.regulation.entity.PreparationLevel;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 /**
  * 여정에 챙길 약 (trip ↔ medication + 판정 스냅샷)
  */
@@ -60,6 +62,20 @@ public class TripMedication {
     // 수량 조건 (예: "최대 2160mg · 30일분") — 규제 없으면 null
     @Column(name = "quantity_condition")
     private String quantityCondition;
+
+    // AI 근거 요약 (근거탭 최초 조회 때 생성해 저장, 이후 재사용)
+    @Column(name = "basis_summary", columnDefinition = "TEXT")
+    private String basisSummary;
+
+    // 근거 생성 시각
+    @Column(name = "basis_generated_at")
+    private LocalDateTime basisGeneratedAt;
+
+    // 근거 요약 저장 (생성 시점 함께 기록)
+    public void updateBasis(String basisSummary) {
+        this.basisSummary = basisSummary;
+        this.basisGeneratedAt = LocalDateTime.now();
+    }
 
     // 여정에 챙길 약 한 건 — 일수 + analyze 판정 스냅샷(신호등·통제여부·분류·수량조건)
     public static TripMedication of(Trip trip, Medication medication, Integer carryDays,

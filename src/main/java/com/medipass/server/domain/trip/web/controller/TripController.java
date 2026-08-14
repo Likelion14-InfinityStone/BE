@@ -9,6 +9,7 @@ import com.medipass.server.domain.trip.web.dto.TripCreateReq;
 import com.medipass.server.domain.trip.web.dto.TripCreateRes;
 import com.medipass.server.domain.trip.web.dto.ChecklistDoneUpdateReq;
 import com.medipass.server.domain.trip.web.dto.TripDetailRes;
+import com.medipass.server.domain.trip.web.dto.TripMedicationBasisRes;
 import com.medipass.server.domain.trip.web.dto.TripMedicationChecklistRes;
 import com.medipass.server.domain.trip.web.dto.TripMedicationDestinationRes;
 import com.medipass.server.domain.trip.web.dto.TripTitleUpdateReq;
@@ -101,6 +102,17 @@ public class TripController {
             @PathVariable Long tripMedicationId
     ) {
         return ApiResponse.success(tripService.getDestinationRules(
+                userDetails.getUser().getId(), tripId, tripMedicationId));
+    }
+
+    // 약 상세 - 근거 — AI 요약(없으면 생성) + 출처
+    @GetMapping("/{tripId}/medications/{tripMedicationId}/basis")
+    public ApiResponse<TripMedicationBasisRes> basis(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @PathVariable Long tripId,
+            @PathVariable Long tripMedicationId
+    ) {
+        return ApiResponse.success(tripService.getBasis(
                 userDetails.getUser().getId(), tripId, tripMedicationId));
     }
 

@@ -29,6 +29,7 @@ import com.medipass.server.domain.trip.web.dto.TripChecklogRes;
 import com.medipass.server.domain.trip.web.dto.TripCreateReq;
 import com.medipass.server.domain.trip.web.dto.TripCreateRes;
 import com.medipass.server.domain.trip.web.dto.TripDetailRes;
+import com.medipass.server.domain.trip.web.dto.TripMedicationBasisRes;
 import com.medipass.server.domain.trip.web.dto.TripMedicationChecklistRes;
 import com.medipass.server.domain.trip.web.dto.TripMedicationDestinationRes;
 import com.medipass.server.domain.trip.web.dto.TripTitleUpdateRes;
@@ -61,6 +62,7 @@ public class TripService {
     private final RequirementTemplateRepository templateRepository;
     private final RegulationJudgeService judgeService;
     private final MedicationJudgmentAssembler judgmentAssembler;
+    private final MedicationBasisService medicationBasisService;
 
     // ─────────────────────────── 약 선택 (여행 등록 중) ───────────────────────────
 
@@ -190,6 +192,18 @@ public class TripService {
 
         List<ChecklistItem> checklist = checklistItemRepository.findByTripMedication_Id(tripMedicationId);
         return TripMedicationDestinationRes.from(tripMedication, checklist);
+    }
+
+    // 약 상세 - 근거 — 저장된 AI 근거 반환, 없으면 생성해 저장 후 반환
+    @Transactional
+    public TripMedicationBasisRes getBasis(Long userId, Long tripId, Long tripMedicationId) {
+        loadOwnedTrip(userId, tripId); // 404/403 가드
+
+        TripMedication tripMedication = tripMedicationRepository.findById(tripMedicationId)
+                .filter(tm -> tm.getTrip().getId().equals(tripId))
+                .orElseThrow(TripMedicationNotFoundException::new);
+
+        return medicationBasisService.getOrGenerate(tripMedication);
     }
 
     // 약 상세 - 체크리스트 조회 (진행률 + 서류 항목)
