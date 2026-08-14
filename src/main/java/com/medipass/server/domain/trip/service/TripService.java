@@ -171,6 +171,22 @@ public class TripService {
         return new TripChecklogRes(countries, selected, items);
     }
 
+    // ─────────────────────────── 삭제 ───────────────────────────
+
+    // 여행 삭제 — 체크리스트·여행약(자식)부터 지우고 여행 삭제
+    @Transactional
+    public void deleteTrip(Long userId, Long tripId) {
+        Trip trip = loadOwnedTrip(userId, tripId); // 404/403 가드
+
+        List<TripMedication> medications = tripMedicationRepository.findByTrip_Id(tripId);
+        List<Long> medicationIds = medications.stream().map(TripMedication::getId).toList();
+        if (!medicationIds.isEmpty()) {
+            checklistItemRepository.deleteByTripMedication_IdIn(medicationIds);
+        }
+        tripMedicationRepository.deleteAll(medications);
+        tripRepository.delete(trip);
+    }
+
     // ─────────────────────────── 상세 (여행 티켓) ───────────────────────────
 
     // 여행 상세 — 여행 카드 + 담긴 약(신호등) 목록

@@ -21,6 +21,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -92,6 +93,16 @@ public class TripController {
             @Valid @RequestBody TripTitleUpdateReq request
     ) {
         return ApiResponse.success(tripService.updateTitle(userDetails.getUser().getId(), tripId, request.title()));
+    }
+
+    // 여행 삭제 — 담긴 약·체크리스트까지 함께 삭제
+    @DeleteMapping("/{tripId}")
+    public ApiResponse<Void> delete(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @PathVariable Long tripId
+    ) {
+        tripService.deleteTrip(userDetails.getUser().getId(), tripId);
+        return ApiResponse.success();
     }
 
     // 약 상세 - 목적지 규정 — 헤더(제품·성분·함량) + 판정 스냅샷 + 필요 서류
