@@ -4,6 +4,7 @@ import com.medipass.server.domain.country.entity.Country;
 import com.medipass.server.domain.country.repository.CountryRepository;
 import com.medipass.server.domain.medication.entity.Medication;
 import com.medipass.server.domain.medication.repository.MedicationRepository;
+import com.medipass.server.domain.medication.web.dto.MedicationListRes;
 import com.medipass.server.domain.regulation.repository.RequirementTemplateRepository;
 import com.medipass.server.domain.regulation.service.RegulationJudgeService;
 import com.medipass.server.domain.regulation.web.dto.JudgeReq;
@@ -53,6 +54,14 @@ public class TripService {
     private final RegulationJudgeService judgeService;
     private final MedicationJudgmentAssembler judgmentAssembler;
     private final MfdsClient mfdsClient;
+
+    // ─────────────────────────── 약 선택 (여행 등록 중) ───────────────────────────
+
+    // 여행 등록 중 가져갈 약 선택용 — 내 복약카드 목록 (최근 등록순)
+    @Transactional(readOnly = true)
+    public MedicationListRes selectableMedications(Long userId) {
+        return MedicationListRes.from(medicationRepository.findByUser_IdOrderByCreatedAtDesc(userId));
+    }
 
     // ─────────────────────────── 분석 (판정, 저장 X) ───────────────────────────
 

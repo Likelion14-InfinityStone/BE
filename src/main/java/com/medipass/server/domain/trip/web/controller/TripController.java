@@ -1,5 +1,6 @@
 package com.medipass.server.domain.trip.web.controller;
 
+import com.medipass.server.domain.medication.web.dto.MedicationListRes;
 import com.medipass.server.domain.trip.service.TripService;
 import com.medipass.server.domain.trip.web.dto.TripAnalyzeReq;
 import com.medipass.server.domain.trip.web.dto.TripAnalyzeRes;
@@ -55,5 +56,13 @@ public class TripController {
             @RequestParam(name = "country", required = false) String country
     ) {
         return ApiResponse.success(tripService.checklog(userDetails.getUser().getId(), country));
+    }
+
+    // 여행 등록 중 가져갈 약 선택 — 내 복약카드 목록
+    @GetMapping("/medications")
+    public ApiResponse<MedicationListRes> selectableMedications(
+            @AuthenticationPrincipal CustomUserDetails userDetails
+    ) {
+        return ApiResponse.success(tripService.selectableMedications(userDetails.getUser().getId()));
     }
 }
