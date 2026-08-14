@@ -44,4 +44,9 @@ public class ChecklistItem {
                 .done(false)
                 .build();
     }
+
+    // 체크(완료) 여부 변경
+    public void updateDone(boolean done) {
+        this.done = done;
+    }
 }

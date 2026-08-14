@@ -5,6 +5,7 @@ import com.medipass.server.domain.country.repository.CountryRepository;
 import com.medipass.server.domain.medication.entity.Medication;
 import com.medipass.server.domain.medication.repository.MedicationRepository;
 import com.medipass.server.domain.medication.web.dto.MedicationListRes;
+import com.medipass.server.domain.regulation.entity.RequirementKind;
 import com.medipass.server.domain.regulation.repository.RequirementTemplateRepository;
 import com.medipass.server.domain.regulation.service.RegulationJudgeService;
 import com.medipass.server.domain.regulation.web.dto.JudgeReq;
@@ -12,6 +13,8 @@ import com.medipass.server.domain.regulation.web.dto.JudgeRes;
 import com.medipass.server.domain.trip.entity.ChecklistItem;
 import com.medipass.server.domain.trip.entity.Trip;
 import com.medipass.server.domain.trip.entity.TripMedication;
+import com.medipass.server.domain.trip.exception.ChecklistItemNotFoundException;
+import com.medipass.server.domain.trip.exception.ChecklistUploadNotToggleableException;
 import com.medipass.server.domain.trip.exception.TripAccessDeniedException;
 import com.medipass.server.domain.trip.exception.TripMedicationNotFoundException;
 import com.medipass.server.domain.trip.exception.TripNotFoundException;
@@ -26,6 +29,7 @@ import com.medipass.server.domain.trip.web.dto.TripChecklogRes;
 import com.medipass.server.domain.trip.web.dto.TripCreateReq;
 import com.medipass.server.domain.trip.web.dto.TripCreateRes;
 import com.medipass.server.domain.trip.web.dto.TripDetailRes;
+import com.medipass.server.domain.trip.web.dto.TripMedicationChecklistRes;
 import com.medipass.server.domain.trip.web.dto.TripMedicationDestinationRes;
 import com.medipass.server.domain.trip.web.dto.TripTitleUpdateRes;
 import com.medipass.server.domain.user.entity.User;
@@ -186,6 +190,39 @@ public class TripService {
 
         List<ChecklistItem> checklist = checklistItemRepository.findByTripMedication_Id(tripMedicationId);
         return TripMedicationDestinationRes.from(tripMedication, checklist);
+    }
+
+    // 약 상세 - 체크리스트 조회 (진행률 + 서류 항목)
+    @Transactional(readOnly = true)
+    public TripMedicationChecklistRes getChecklist(Long userId, Long tripId, Long tripMedicationId) {
+        loadOwnedTrip(userId, tripId); // 404/403 가드
+        tripMedicationRepository.findById(tripMedicationId)
+                .filter(tm -> tm.getTrip().getId().equals(tripId))
+                .orElseThrow(TripMedicationNotFoundException::new);
+
+        return TripMedicationChecklistRes.from(
+                tripMedicationId, checklistItemRepository.findByTripMedication_Id(tripMedicationId));
+    }
+
+    // 약 상세 - 체크리스트 항목 체크/해제
+    @Transactional
+    public TripMedicationChecklistRes updateChecklistDone(
+            Long userId, Long tripId, Long tripMedicationId, Long checklistItemId, boolean done) {
+        loadOwnedTrip(userId, tripId); // 404/403 가드
+
+        ChecklistItem item = checklistItemRepository.findById(checklistItemId)
+                .filter(ci -> ci.getTripMedication().getId().equals(tripMedicationId)
+                        && ci.getTripMedication().getTrip().getId().equals(tripId))
+                .orElseThrow(ChecklistItemNotFoundException::new);
+
+        // 업로드 서류는 파일 업로드로만 완료됨 — 토글 대상은 신청·문의(ACTION)뿐
+        if (item.getRequirementTemplate().getKind() == RequirementKind.UPLOAD) {
+            throw new ChecklistUploadNotToggleableException();
+        }
+        item.updateDone(done);
+
+        return TripMedicationChecklistRes.from(
+                tripMedicationId, checklistItemRepository.findByTripMedication_Id(tripMedicationId));
     }
 
     // ─────────────────────────── 이름 수정 ───────────────────────────

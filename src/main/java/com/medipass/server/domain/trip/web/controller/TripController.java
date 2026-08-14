@@ -7,7 +7,9 @@ import com.medipass.server.domain.trip.web.dto.TripAnalyzeRes;
 import com.medipass.server.domain.trip.web.dto.TripChecklogRes;
 import com.medipass.server.domain.trip.web.dto.TripCreateReq;
 import com.medipass.server.domain.trip.web.dto.TripCreateRes;
+import com.medipass.server.domain.trip.web.dto.ChecklistDoneUpdateReq;
 import com.medipass.server.domain.trip.web.dto.TripDetailRes;
+import com.medipass.server.domain.trip.web.dto.TripMedicationChecklistRes;
 import com.medipass.server.domain.trip.web.dto.TripMedicationDestinationRes;
 import com.medipass.server.domain.trip.web.dto.TripTitleUpdateReq;
 import com.medipass.server.domain.trip.web.dto.TripTitleUpdateRes;
@@ -100,5 +102,29 @@ public class TripController {
     ) {
         return ApiResponse.success(tripService.getDestinationRules(
                 userDetails.getUser().getId(), tripId, tripMedicationId));
+    }
+
+    // 약 상세 - 체크리스트 조회 (진행률 + 서류 항목)
+    @GetMapping("/{tripId}/medications/{tripMedicationId}/checklist")
+    public ApiResponse<TripMedicationChecklistRes> checklist(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @PathVariable Long tripId,
+            @PathVariable Long tripMedicationId
+    ) {
+        return ApiResponse.success(tripService.getChecklist(
+                userDetails.getUser().getId(), tripId, tripMedicationId));
+    }
+
+    // 약 상세 - 체크리스트 항목 체크/해제
+    @PatchMapping("/{tripId}/medications/{tripMedicationId}/checklist/{checklistItemId}")
+    public ApiResponse<TripMedicationChecklistRes> updateChecklistDone(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @PathVariable Long tripId,
+            @PathVariable Long tripMedicationId,
+            @PathVariable Long checklistItemId,
+            @Valid @RequestBody ChecklistDoneUpdateReq request
+    ) {
+        return ApiResponse.success(tripService.updateChecklistDone(
+                userDetails.getUser().getId(), tripId, tripMedicationId, checklistItemId, request.done()));
     }
 }
