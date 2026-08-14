@@ -18,6 +18,10 @@ public class Country {
     @Column(name = "code", length = 2, nullable = false)
     private String code;
 
+    // ISO 3166-1 alpha-3 (KOR, JPN, CHN ...) — 항공/화면 표기용
+    @Column(name = "code_alpha3", length = 3)
+    private String codeAlpha3;
+
     // 한글 국가명 (대한민국, 일본, 중국)
     @Column(name = "name_ko")
     private String nameKo;

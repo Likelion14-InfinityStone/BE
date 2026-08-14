@@ -51,17 +51,10 @@ public class Medication extends BaseEntity {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    // 품목기준코드(ITEM_SEQ)
-    @Column(name = "mfds_product_code", nullable = false, length = 30)
-    private String mfdsProductCode;
-
-    // 한글 제품명
-    @Column(name = "product_ko_name", nullable = false, length = 300)
-    private String productKoName;
-
-    // 영문 제품명, 없으면 null
-    @Column(name = "product_en_name", length = 300)
-    private String productEnName;
+    // 식약처 제품 마스터 참조 — 제품명·성분·함량은 마스터가 보유 (mfds_product_code FK)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "mfds_product_code", nullable = false)
+    private MfdsProduct product;
 
     // 약 봉투 조제일자
     @Column(name = "dispensed_at")
@@ -90,9 +83,7 @@ public class Medication extends BaseEntity {
 
     public static Medication create(
             User user,
-            String mfdsProductCode,
-            String productKoName,
-            String productEnName,
+            MfdsProduct product,
             LocalDate dispensedAt,
             String issuer,
             Integer intakesPerDay,
@@ -102,9 +93,7 @@ public class Medication extends BaseEntity {
     ) {
         return Medication.builder()
                 .user(user)
-                .mfdsProductCode(mfdsProductCode)
-                .productKoName(productKoName)
-                .productEnName(productEnName)
+                .product(product)
                 .dispensedAt(dispensedAt)
                 .issuer(issuer)
                 .intakesPerDay(intakesPerDay)

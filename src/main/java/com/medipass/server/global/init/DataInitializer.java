@@ -26,18 +26,18 @@ public class DataInitializer implements ApplicationRunner {
     private final RegulationImportService regulationImportService;
     private final RequirementImportService requirementImportService;
 
-    // 국가 마스터 시드 (code, name_ko, name_en, local_lang) — 10개국
+    // 국가 마스터 시드 (code, code_alpha3, name_ko, name_en, local_lang) — 10개국
     private static final List<String[]> COUNTRIES = List.of(
-            new String[]{"AU", "호주", "Australia", "en"},
-            new String[]{"CN", "중국", "China", "zh"},
-            new String[]{"DE", "독일", "Germany", "de"},
-            new String[]{"FR", "프랑스", "France", "fr"},
-            new String[]{"GB", "영국", "United Kingdom", "en"},
-            new String[]{"JP", "일본", "Japan", "ja"},
-            new String[]{"KR", "대한민국", "South Korea", "ko"},
-            new String[]{"TH", "태국", "Thailand", "th"},
-            new String[]{"US", "미국", "United States", "en"},
-            new String[]{"VN", "베트남", "Vietnam", "vi"}
+            new String[]{"AU", "AUS", "호주", "Australia", "en"},
+            new String[]{"CN", "CHN", "중국", "China", "zh"},
+            new String[]{"DE", "DEU", "독일", "Germany", "de"},
+            new String[]{"FR", "FRA", "프랑스", "France", "fr"},
+            new String[]{"GB", "GBR", "영국", "United Kingdom", "en"},
+            new String[]{"JP", "JPN", "일본", "Japan", "ja"},
+            new String[]{"KR", "KOR", "대한민국", "South Korea", "ko"},
+            new String[]{"TH", "THA", "태국", "Thailand", "th"},
+            new String[]{"US", "USA", "미국", "United States", "en"},
+            new String[]{"VN", "VNM", "베트남", "Vietnam", "vi"}
     );
 
     @Override
@@ -48,15 +48,15 @@ public class DataInitializer implements ApplicationRunner {
     }
 
     private void seedCountries() {
+        // 매 기동마다 upsert — 컬럼 추가 시 기존 행에도 값이 채워지도록
         for (String[] c : COUNTRIES) {
-            if (!countryRepository.existsById(c[0])) {
-                countryRepository.save(Country.builder()
-                        .code(c[0])
-                        .nameKo(c[1])
-                        .nameEn(c[2])
-                        .localLang(c[3])
-                        .build());
-            }
+            countryRepository.save(Country.builder()
+                    .code(c[0])
+                    .codeAlpha3(c[1])
+                    .nameKo(c[2])
+                    .nameEn(c[3])
+                    .localLang(c[4])
+                    .build());
         }
         log.info("[국가시드] {}개국 확인/생성 완료", COUNTRIES.size());
     }
