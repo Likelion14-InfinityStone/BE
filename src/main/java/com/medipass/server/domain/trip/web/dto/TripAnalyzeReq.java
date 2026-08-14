@@ -15,7 +15,7 @@ import java.util.List;
 public record TripAnalyzeReq(
 
         @NotBlank(message = "도착 국가 코드는 필수입니다")
-        String destinationCountryCode, // JAP (ISO alpha-3)
+        String destinationCodeAlpha3, // JPN (ISO alpha-3)
 
         @NotEmpty(message = "약을 1개 이상 선택해야 합니다")
         @Valid

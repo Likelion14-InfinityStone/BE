@@ -72,7 +72,7 @@ public class TripService {
 
     @Transactional(readOnly = true)
     public TripAnalyzeRes analyze(Long userId, TripAnalyzeReq request) {
-        Country destination = findCountry(request.destinationCountryCode());
+        Country destination = findCountry(request.destinationCodeAlpha3());
         List<TripAnalyzeRes.MedicationResult> results = request.medications().stream()
                 .map(item -> analyzeOne(userId, destination.getCode(), item))
                 .toList();
@@ -95,8 +95,8 @@ public class TripService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new BaseException(ErrorResponseCode.NOT_FOUND_RESOURCE, "사용자를 찾을 수 없습니다."));
 
-        Country origin = findCountry(request.origin().countryCode());
-        Country destination = findCountry(request.destination().countryCode());
+        Country origin = findCountry(request.origin().codeAlpha3());
+        Country destination = findCountry(request.destination().codeAlpha3());
         String title = resolveTitle(userId, request.title(), destination);
 
         Trip trip = tripRepository.save(Trip.of(

@@ -48,7 +48,7 @@ public record TripCreateReq(
             String city,          // 인천
 
             @NotBlank(message = "국가 코드는 필수입니다")
-            String countryCode    // KOR (ISO 3166-1 alpha-3)
+            String codeAlpha3     // KOR (ISO 3166-1 alpha-3)
     ) {
     }
 
