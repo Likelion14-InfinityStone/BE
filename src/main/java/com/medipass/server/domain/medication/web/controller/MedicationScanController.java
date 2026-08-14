@@ -14,9 +14,9 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-@Tag(name = "Medication Scan", description = "약 봉투 이미지 인식 API")
+@Tag(name = "Medication", description = "의약품 스캔·검색·등록 API")
 @RestController
-@RequestMapping("/api/medication-scans")
+@RequestMapping("/api/medications")
 @RequiredArgsConstructor
 public class MedicationScanController {
 
@@ -28,7 +28,7 @@ public class MedicationScanController {
                     + "항목의 mfdsProductCode와 productKoName이 모두 null이면 매칭 실패이므로 의약품 인식 실패 및 재촬영 안내가 필요합니다. "
                     + "복용 정보가 인식되지 않으면 해당 필드는 null로 반환됩니다."
     )
-    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/scans", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ApiResponse<MedicationScanRes> scan(
             @Parameter(description = "약 봉투 이미지(JPEG 또는 PNG)", required = true)
             @RequestPart("file") MultipartFile file
