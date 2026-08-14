@@ -7,25 +7,34 @@ import com.medipass.server.domain.medication.exception.MedicationProductMismatch
 import com.medipass.server.domain.medication.repository.MedicationRepository;
 import com.medipass.server.domain.medication.web.dto.MedicationCreateReq;
 import com.medipass.server.domain.medication.web.dto.MedicationCreateRes;
+import com.medipass.server.domain.medication.web.dto.MedicationCardPageRes;
 import com.medipass.server.domain.medication.web.dto.MedicationListRes;
+import com.medipass.server.domain.trip.entity.TripMedication;
+import com.medipass.server.domain.trip.repository.TripMedicationRepository;
 import com.medipass.server.domain.user.entity.User;
 import com.medipass.server.domain.user.repository.UserRepository;
 import com.medipass.server.global.exception.BaseException;
 import com.medipass.server.global.response.code.ErrorResponseCode;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.dao.DataIntegrityViolationException;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class MedicationService {
 
     private final MedicationRepository medicationRepository;
+    private final TripMedicationRepository tripMedicationRepository;
     private final UserRepository userRepository;
     private final MfdsProductService mfdsProductService;
 
@@ -34,6 +43,43 @@ public class MedicationService {
     public MedicationListRes getAll(Long userId) {
         return MedicationListRes.from(
                 medicationRepository.findByUser_IdOrderByCreatedAtDesc(userId)
+        );
+    }
+
+    @Transactional(readOnly = true)
+    public MedicationCardPageRes getCards(Long userId, int page, int size) {
+        // 카드가 없어도 닉네임은 반환한다.
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new BaseException(
+                        ErrorResponseCode.NOT_FOUND_RESOURCE,
+                        "사용자 정보를 찾을 수 없습니다."
+                ));
+
+        // 가로 스와이프용 카드를 최근 등록순으로 페이지 조회한다.
+        PageRequest pageRequest = PageRequest.of(
+                page,
+                size,
+                Sort.by(Sort.Direction.DESC, "createdAt")
+                        .and(Sort.by(Sort.Direction.DESC, "id"))
+        );
+        Page<Medication> medications = medicationRepository.findByUser_Id(userId, pageRequest);
+
+        // 현재 페이지 카드들의 연결 여행을 한 번에 조회해 카드별로 묶는다.
+        List<Long> medicationIds = medications.getContent().stream()
+                .map(Medication::getId)
+                .toList();
+        Map<Long, List<TripMedication>> tripMedicationsByMedicationId = medicationIds.isEmpty()
+                ? Map.of()
+                : tripMedicationRepository
+                        .findByMedication_IdInAndMedication_User_Id(medicationIds, userId)
+                        .stream()
+                        .collect(Collectors.groupingBy(item -> item.getMedication().getId()));
+
+        // 닉네임, 카드 앞·뒷면 정보와 페이지 정보를 응답 DTO로 변환한다.
+        return MedicationCardPageRes.from(
+                user.getNickName(),
+                medications,
+                tripMedicationsByMedicationId
         );
     }
 
