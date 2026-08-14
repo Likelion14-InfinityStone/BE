@@ -8,6 +8,7 @@ import com.medipass.server.domain.trip.web.dto.TripChecklogRes;
 import com.medipass.server.domain.trip.web.dto.TripCreateReq;
 import com.medipass.server.domain.trip.web.dto.TripCreateRes;
 import com.medipass.server.domain.trip.web.dto.TripDetailRes;
+import com.medipass.server.domain.trip.web.dto.TripMedicationDestinationRes;
 import com.medipass.server.domain.trip.web.dto.TripTitleUpdateReq;
 import com.medipass.server.domain.trip.web.dto.TripTitleUpdateRes;
 import com.medipass.server.global.jwt.CustomUserDetails;
@@ -88,5 +89,16 @@ public class TripController {
             @Valid @RequestBody TripTitleUpdateReq request
     ) {
         return ApiResponse.success(tripService.updateTitle(userDetails.getUser().getId(), tripId, request.title()));
+    }
+
+    // 약 상세 - 목적지 규정 — 헤더(제품·성분·함량) + 판정 스냅샷 + 필요 서류
+    @GetMapping("/{tripId}/medications/{tripMedicationId}/destination")
+    public ApiResponse<TripMedicationDestinationRes> destinationRules(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @PathVariable Long tripId,
+            @PathVariable Long tripMedicationId
+    ) {
+        return ApiResponse.success(tripService.getDestinationRules(
+                userDetails.getUser().getId(), tripId, tripMedicationId));
     }
 }

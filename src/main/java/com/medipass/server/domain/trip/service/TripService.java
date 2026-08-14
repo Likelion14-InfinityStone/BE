@@ -13,6 +13,7 @@ import com.medipass.server.domain.trip.entity.ChecklistItem;
 import com.medipass.server.domain.trip.entity.Trip;
 import com.medipass.server.domain.trip.entity.TripMedication;
 import com.medipass.server.domain.trip.exception.TripAccessDeniedException;
+import com.medipass.server.domain.trip.exception.TripMedicationNotFoundException;
 import com.medipass.server.domain.trip.exception.TripNotFoundException;
 import com.medipass.server.domain.trip.exception.TripTitleDuplicateException;
 import com.medipass.server.domain.trip.repository.ChecklistItemRepository;
@@ -25,6 +26,7 @@ import com.medipass.server.domain.trip.web.dto.TripChecklogRes;
 import com.medipass.server.domain.trip.web.dto.TripCreateReq;
 import com.medipass.server.domain.trip.web.dto.TripCreateRes;
 import com.medipass.server.domain.trip.web.dto.TripDetailRes;
+import com.medipass.server.domain.trip.web.dto.TripMedicationDestinationRes;
 import com.medipass.server.domain.trip.web.dto.TripTitleUpdateRes;
 import com.medipass.server.domain.user.entity.User;
 import com.medipass.server.domain.user.repository.UserRepository;
@@ -171,6 +173,19 @@ public class TripService {
         Trip trip = loadOwnedTrip(userId, tripId);
         List<TripMedication> medications = tripMedicationRepository.findByTrip_Id(tripId);
         return TripDetailRes.from(trip, medications, LocalDate.now());
+    }
+
+    // 약 상세 - 목적지 규정 — 헤더(제품·성분·함량) + 판정 스냅샷 + 필요 서류
+    @Transactional(readOnly = true)
+    public TripMedicationDestinationRes getDestinationRules(Long userId, Long tripId, Long tripMedicationId) {
+        loadOwnedTrip(userId, tripId); // 404/403 가드
+
+        TripMedication tripMedication = tripMedicationRepository.findById(tripMedicationId)
+                .filter(tm -> tm.getTrip().getId().equals(tripId))
+                .orElseThrow(TripMedicationNotFoundException::new);
+
+        List<ChecklistItem> checklist = checklistItemRepository.findByTripMedication_Id(tripMedicationId);
+        return TripMedicationDestinationRes.from(tripMedication, checklist);
     }
 
     // ─────────────────────────── 이름 수정 ───────────────────────────
