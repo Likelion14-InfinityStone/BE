@@ -7,6 +7,7 @@ import com.medipass.server.domain.medication.exception.MedicationProductMismatch
 import com.medipass.server.domain.medication.repository.MedicationRepository;
 import com.medipass.server.domain.medication.web.dto.MedicationCreateReq;
 import com.medipass.server.domain.medication.web.dto.MedicationCreateRes;
+import com.medipass.server.domain.medication.web.dto.MedicationListRes;
 import com.medipass.server.domain.user.entity.User;
 import com.medipass.server.domain.user.repository.UserRepository;
 import com.medipass.server.global.exception.BaseException;
@@ -27,6 +28,14 @@ public class MedicationService {
     private final MedicationRepository medicationRepository;
     private final UserRepository userRepository;
     private final MfdsProductService mfdsProductService;
+
+    // 사용자의 복약카드 목록을 최근 등록순으로 조회한다.
+    @Transactional(readOnly = true)
+    public MedicationListRes getAll(Long userId) {
+        return MedicationListRes.from(
+                medicationRepository.findByUser_IdOrderByCreatedAtDesc(userId)
+        );
+    }
 
     @Transactional
     public MedicationCreateRes create(Long userId, MedicationCreateReq request) {
