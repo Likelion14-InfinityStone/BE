@@ -12,6 +12,9 @@ import com.medipass.server.domain.regulation.web.dto.JudgeRes;
 import com.medipass.server.domain.trip.entity.ChecklistItem;
 import com.medipass.server.domain.trip.entity.Trip;
 import com.medipass.server.domain.trip.entity.TripMedication;
+import com.medipass.server.domain.trip.exception.TripAccessDeniedException;
+import com.medipass.server.domain.trip.exception.TripNotFoundException;
+import com.medipass.server.domain.trip.exception.TripTitleDuplicateException;
 import com.medipass.server.domain.trip.repository.ChecklistItemRepository;
 import com.medipass.server.domain.trip.repository.TripMedicationRepository;
 import com.medipass.server.domain.trip.repository.TripRepository;
@@ -22,6 +25,7 @@ import com.medipass.server.domain.trip.web.dto.TripAnalyzeRes;
 import com.medipass.server.domain.trip.web.dto.TripChecklogRes;
 import com.medipass.server.domain.trip.web.dto.TripCreateReq;
 import com.medipass.server.domain.trip.web.dto.TripCreateRes;
+import com.medipass.server.domain.trip.web.dto.TripTitleUpdateRes;
 import com.medipass.server.domain.user.entity.User;
 import com.medipass.server.domain.user.repository.UserRepository;
 import com.medipass.server.global.exception.BaseException;
@@ -160,7 +164,32 @@ public class TripService {
         return new TripChecklogRes(countries, selected, items);
     }
 
+    // ─────────────────────────── 이름 수정 ───────────────────────────
+
+    // 여행 제목 변경 — 같은 사용자 안에서 이름이 겹치면 409
+    @Transactional
+    public TripTitleUpdateRes updateTitle(Long userId, Long tripId, String title) {
+        Trip trip = loadOwnedTrip(userId, tripId);
+        String newTitle = title.trim();
+
+        if (tripRepository.existsByUser_IdAndTitleAndIdNot(userId, newTitle, tripId)) {
+            throw new TripTitleDuplicateException();
+        }
+
+        trip.updateTitle(newTitle);
+        return TripTitleUpdateRes.from(trip);
+    }
+
     // ─────────────────────────── 공통 ───────────────────────────
+
+    private Trip loadOwnedTrip(Long userId, Long tripId) {
+        Trip trip = tripRepository.findById(tripId)
+                .orElseThrow(TripNotFoundException::new);
+        if (!trip.getUser().getId().equals(userId)) {
+            throw new TripAccessDeniedException();
+        }
+        return trip;
+    }
 
     private Medication loadOwnedMedication(Long userId, Long medicationId) {
         Medication medication = medicationRepository.findById(medicationId)

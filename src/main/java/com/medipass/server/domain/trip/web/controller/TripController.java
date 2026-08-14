@@ -7,6 +7,8 @@ import com.medipass.server.domain.trip.web.dto.TripAnalyzeRes;
 import com.medipass.server.domain.trip.web.dto.TripChecklogRes;
 import com.medipass.server.domain.trip.web.dto.TripCreateReq;
 import com.medipass.server.domain.trip.web.dto.TripCreateRes;
+import com.medipass.server.domain.trip.web.dto.TripTitleUpdateReq;
+import com.medipass.server.domain.trip.web.dto.TripTitleUpdateRes;
 import com.medipass.server.global.jwt.CustomUserDetails;
 import com.medipass.server.global.response.ApiResponse;
 import com.medipass.server.global.response.code.SuccessResponseCode;
@@ -15,6 +17,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -64,5 +68,15 @@ public class TripController {
             @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
         return ApiResponse.success(tripService.selectableMedications(userDetails.getUser().getId()));
+    }
+
+    // 여행 이름 수정 — 같은 사용자 안에서 이름 겹치면 409
+    @PatchMapping("/{tripId}/title")
+    public ApiResponse<TripTitleUpdateRes> updateTitle(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @PathVariable Long tripId,
+            @Valid @RequestBody TripTitleUpdateReq request
+    ) {
+        return ApiResponse.success(tripService.updateTitle(userDetails.getUser().getId(), tripId, request.title()));
     }
 }

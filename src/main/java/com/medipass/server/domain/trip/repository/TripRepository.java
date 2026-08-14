@@ -15,4 +15,7 @@ public interface TripRepository extends JpaRepository<Trip, Long> {
 
     // 제목 자동생성 시 중복 확인
     boolean existsByUser_IdAndTitle(Long userId, String title);
+
+    // 제목 수정 시 중복 확인 (자기 자신 제외)
+    boolean existsByUser_IdAndTitleAndIdNot(Long userId, String title, Long id);
 }

@@ -86,4 +86,9 @@ public class Trip extends BaseEntity {
                 .returnOn(returnOn)
                 .build();
     }
+
+    // 여행 제목 변경 (중복 검사는 서비스에서)
+    public void updateTitle(String title) {
+        this.title = title;
+    }
 }
