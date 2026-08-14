@@ -2,6 +2,7 @@ package com.medipass.server.domain.medication.service;
 
 import com.medipass.server.domain.medication.entity.Medication;
 import com.medipass.server.domain.medication.entity.MfdsProduct;
+import com.medipass.server.domain.medication.exception.MedicationDuplicateException;
 import com.medipass.server.domain.medication.repository.MedicationRepository;
 import com.medipass.server.domain.medication.web.dto.MedicationCreateReq;
 import com.medipass.server.domain.medication.web.dto.MedicationCreateRes;
@@ -12,8 +13,11 @@ import com.medipass.server.global.response.code.ErrorResponseCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.dao.DataIntegrityViolationException;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -31,6 +35,8 @@ public class MedicationService {
                         "사용자 정보를 찾을 수 없습니다."
                 ));
 
+        validateNoDuplicates(userId, request);
+
         /*
          * 조제일과 발행기관은 한 장의 약 봉투에서 추출된 공통 정보이므로
          * 같은 요청에 포함된 모든 의약품에 동일하게 저장한다.
@@ -41,7 +47,27 @@ public class MedicationService {
                 .map(item -> toMedication(user, request, item))
                 .toList();
 
-        return MedicationCreateRes.from(medicationRepository.saveAll(medications));
+        try {
+            return MedicationCreateRes.from(medicationRepository.saveAllAndFlush(medications));
+        } catch (DataIntegrityViolationException e) {
+            // 사전 검사 이후 동시에 같은 약이 등록된 경우에도 동일한 409 응답을 보장한다.
+            throw new MedicationDuplicateException();
+        }
+    }
+
+    private void validateNoDuplicates(Long userId, MedicationCreateReq request) {
+        Set<String> requestedProductCodes = new HashSet<>();
+
+        for (MedicationCreateReq.Item item : request.medications()) {
+            String productCode = item.mfdsProductCode().trim();
+            boolean duplicatedInRequest = !requestedProductCodes.add(productCode);
+            boolean alreadyRegistered = medicationRepository
+                    .existsByUser_IdAndProduct_MfdsProductCode(userId, productCode);
+
+            if (duplicatedInRequest || alreadyRegistered) {
+                throw new MedicationDuplicateException();
+            }
+        }
     }
 
     private Medication toMedication(
