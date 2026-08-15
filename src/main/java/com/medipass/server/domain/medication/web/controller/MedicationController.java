@@ -4,6 +4,8 @@ import com.medipass.server.domain.medication.service.MedicationService;
 import com.medipass.server.domain.medication.web.dto.MedicationCreateReq;
 import com.medipass.server.domain.medication.web.dto.MedicationCreateRes;
 import com.medipass.server.domain.medication.web.dto.MedicationCardPageRes;
+import com.medipass.server.domain.medication.web.dto.MedicationCardDetailRes;
+import com.medipass.server.domain.medication.web.dto.MedicationCardLanguage;
 import com.medipass.server.domain.medication.web.dto.MedicationListRes;
 import com.medipass.server.global.jwt.CustomUserDetails;
 import com.medipass.server.global.response.ApiResponse;
@@ -19,6 +21,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -77,6 +80,24 @@ public class MedicationController {
                 userDetails.getUser().getId(),
                 page,
                 size
+        );
+        return ApiResponse.success(response);
+    }
+
+    @Operation(
+            summary = "복약카드 단건 상세 조회",
+            description = "복약카드 한 건의 앞면과 뒷면 정보를 조회합니다. lang은 ko 또는 en을 지원합니다."
+    )
+    @GetMapping("/{medicationId}/card")
+    public ApiResponse<MedicationCardDetailRes> getCard(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @PathVariable Long medicationId,
+            @RequestParam(defaultValue = "ko") String lang
+    ) {
+        MedicationCardDetailRes response = medicationService.getCard(
+                userDetails.getUser().getId(),
+                medicationId,
+                MedicationCardLanguage.from(lang)
         );
         return ApiResponse.success(response);
     }

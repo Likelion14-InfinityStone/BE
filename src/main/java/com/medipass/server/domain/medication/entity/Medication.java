@@ -64,6 +64,10 @@ public class Medication extends BaseEntity {
     @Column(name = "issuer", length = 200)
     private String issuer;
 
+    // 영문 카드 최초 조회 때 번역해 저장하고 이후 재사용
+    @Column(name = "issuer_en", length = 300)
+    private String issuerEn;
+
     // 하루 복용 횟수
     @Column(name = "intakes_per_day")
     private Integer intakesPerDay;
@@ -101,5 +105,9 @@ public class Medication extends BaseEntity {
                 .dosePerIntake(dosePerIntake)
                 .doseUnit(doseUnit)
                 .build();
+    }
+
+    public void updateIssuerEn(String issuerEn) {
+        this.issuerEn = issuerEn;
     }
 }

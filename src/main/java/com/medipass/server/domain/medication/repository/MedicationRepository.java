@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface MedicationRepository extends JpaRepository<Medication, Long> {
 
@@ -18,4 +19,8 @@ public interface MedicationRepository extends JpaRepository<Medication, Long> {
     // 홈 화면 복약카드 페이지 — DTO 변환 중 제품명 조회를 위해 product를 함께 로딩한다.
     @EntityGraph(attributePaths = "product")
     Page<Medication> findByUser_Id(Long userId, Pageable pageable);
+
+    // 복약카드 상세 — 다른 사용자의 카드는 조회되지 않도록 소유자 조건을 함께 적용한다.
+    @EntityGraph(attributePaths = "product")
+    Optional<Medication> findByIdAndUser_Id(Long medicationId, Long userId);
 }

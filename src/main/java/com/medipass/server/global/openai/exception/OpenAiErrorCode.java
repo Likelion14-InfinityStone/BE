@@ -10,7 +10,7 @@ import org.springframework.http.HttpStatus;
 public enum OpenAiErrorCode implements BaseResponseCode {
 
     NOT_CONFIGURED(HttpStatus.INTERNAL_SERVER_ERROR, "OPENAI_500", "OpenAI 설정이 없습니다."),
-    SERVICE_UNAVAILABLE(HttpStatus.BAD_GATEWAY, "OPENAI_502", "AI 근거 생성에 실패했습니다.");
+    SERVICE_UNAVAILABLE(HttpStatus.BAD_GATEWAY, "OPENAI_502", "AI 처리 요청에 실패했습니다.");
 
     private final HttpStatus httpStatus;
     private final String code;

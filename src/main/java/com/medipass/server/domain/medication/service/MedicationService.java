@@ -3,11 +3,14 @@ package com.medipass.server.domain.medication.service;
 import com.medipass.server.domain.medication.entity.Medication;
 import com.medipass.server.domain.medication.entity.MfdsProduct;
 import com.medipass.server.domain.medication.exception.MedicationDuplicateException;
+import com.medipass.server.domain.medication.exception.MedicationNotFoundException;
 import com.medipass.server.domain.medication.exception.MedicationProductMismatchException;
 import com.medipass.server.domain.medication.repository.MedicationRepository;
 import com.medipass.server.domain.medication.web.dto.MedicationCreateReq;
 import com.medipass.server.domain.medication.web.dto.MedicationCreateRes;
 import com.medipass.server.domain.medication.web.dto.MedicationCardPageRes;
+import com.medipass.server.domain.medication.web.dto.MedicationCardDetailRes;
+import com.medipass.server.domain.medication.web.dto.MedicationCardLanguage;
 import com.medipass.server.domain.medication.web.dto.MedicationListRes;
 import com.medipass.server.domain.trip.entity.TripMedication;
 import com.medipass.server.domain.trip.repository.TripMedicationRepository;
@@ -37,6 +40,7 @@ public class MedicationService {
     private final TripMedicationRepository tripMedicationRepository;
     private final UserRepository userRepository;
     private final MfdsProductService mfdsProductService;
+    private final IssuerTranslationService issuerTranslationService;
 
     // 사용자의 복약카드 목록을 최근 등록순으로 조회한다.
     @Transactional(readOnly = true)
@@ -80,6 +84,33 @@ public class MedicationService {
                 user.getNickName(),
                 medications,
                 tripMedicationsByMedicationId
+        );
+    }
+
+    @Transactional
+    public MedicationCardDetailRes getCard(Long userId, Long medicationId, MedicationCardLanguage language) {
+        // 소유자 조건을 포함해 다른 사용자의 복약카드가 노출되지 않도록 한다.
+        Medication medication = medicationRepository.findByIdAndUser_Id(medicationId, userId)
+                .orElseThrow(MedicationNotFoundException::new);
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new BaseException(
+                        ErrorResponseCode.NOT_FOUND_RESOURCE,
+                        "사용자 정보를 찾을 수 없습니다."
+                ));
+
+        // 카드에 연결된 여행 국가를 함께 반환한다.
+        List<TripMedication> tripMedications = tripMedicationRepository
+                .findByMedication_IdInAndMedication_User_Id(List.of(medicationId), userId);
+        String issuer = language == MedicationCardLanguage.EN
+                ? issuerTranslationService.getOrTranslate(medication)
+                : medication.getIssuer();
+
+        return MedicationCardDetailRes.from(
+                user.getNickName(),
+                medication,
+                tripMedications,
+                language,
+                issuer
         );
     }
 
