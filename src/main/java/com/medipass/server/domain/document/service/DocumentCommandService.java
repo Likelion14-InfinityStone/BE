@@ -22,6 +22,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -89,6 +91,30 @@ public class DocumentCommandService {
             cleanupUploadedObject(uploaded.objectKey());
             throw e;
         }
+    }
+
+    // 서류를 삭제하고 연결된 체크리스트를 미등록 상태로 되돌린다.
+    @Transactional
+    public void delete(Long userId, Long documentId) {
+        Document document = documentRepository
+                .findByIdAndChecklistItem_TripMedication_Trip_User_Id(documentId, userId)
+                .orElseThrow(() -> new BaseException(
+                        ErrorResponseCode.NOT_FOUND_RESOURCE,
+                        "서류를 찾을 수 없습니다."
+                ));
+
+        String objectKey = document.getObjectKey();
+        document.getChecklistItem().detachDocument();
+        documentRepository.delete(document);
+        documentRepository.flush();
+
+        // DB 커밋이 끝난 뒤 S3 객체를 삭제한다.
+        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+            @Override
+            public void afterCommit() {
+                deleteS3Object(objectKey);
+            }
+        });
     }
 
     // 요청한 사용자가 해당 여행의 소유자인지 확인한다.
@@ -171,6 +197,14 @@ public class DocumentCommandService {
         } catch (RuntimeException cleanupException) {
             log.error("서류 저장 실패 후 S3 객체 정리에 실패했습니다. 객체 키={}",
                     objectKey, cleanupException);
+        }
+    }
+
+    private void deleteS3Object(String objectKey) {
+        try {
+            s3StorageService.delete(objectKey);
+        } catch (RuntimeException e) {
+            log.error("서류 삭제 후 S3 객체 정리에 실패했습니다. 객체 키={}", objectKey, e);
         }
     }
 }

@@ -1,5 +1,6 @@
 package com.medipass.server.domain.document.web.controller;
 
+import com.medipass.server.domain.document.service.DocumentCommandService;
 import com.medipass.server.domain.document.service.DocumentQueryService;
 import com.medipass.server.domain.document.web.dto.DocumentDownloadRes;
 import com.medipass.server.domain.document.web.dto.DocumentMainRes;
@@ -10,6 +11,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -22,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class DocumentCabinetController {
 
+    private final DocumentCommandService documentCommandService;
     private final DocumentQueryService documentQueryService;
 
     @Operation(
@@ -69,5 +72,21 @@ public class DocumentCabinetController {
                         documentId
                 )
         );
+    }
+
+    @Operation(
+            summary = "서류 삭제",
+            description = "등록된 서류를 삭제하고 연결된 체크리스트를 미등록 상태로 변경합니다."
+    )
+    @DeleteMapping("/{documentId}")
+    public ApiResponse<Void> delete(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @PathVariable Long documentId
+    ) {
+        documentCommandService.delete(
+                userDetails.getUser().getId(),
+                documentId
+        );
+        return ApiResponse.success();
     }
 }
