@@ -6,7 +6,11 @@ import com.medipass.server.domain.document.exception.DocumentErrorCode;
 import com.medipass.server.domain.document.exception.DocumentException;
 import com.medipass.server.domain.document.repository.DocumentRepository;
 import com.medipass.server.domain.document.web.dto.DocumentMainRes;
+import com.medipass.server.domain.document.web.dto.MedicationDocumentListRes;
 import com.medipass.server.domain.document.web.dto.DocumentUploadRes;
+import com.medipass.server.domain.medication.entity.Medication;
+import com.medipass.server.domain.medication.exception.MedicationNotFoundException;
+import com.medipass.server.domain.medication.repository.MedicationRepository;
 import com.medipass.server.domain.regulation.entity.RequirementKind;
 import com.medipass.server.domain.trip.entity.ChecklistItem;
 import com.medipass.server.domain.trip.entity.Trip;
@@ -28,6 +32,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
@@ -47,6 +52,7 @@ public class DocumentService {
     );
 
     private final TripRepository tripRepository;
+    private final MedicationRepository medicationRepository;
     private final ChecklistItemRepository checklistItemRepository;
     private final DocumentRepository documentRepository;
     private final S3StorageService s3StorageService;
@@ -83,6 +89,32 @@ public class DocumentService {
                         checklistItems.size() - registeredCount
                 ),
                 List.copyOf(medications.values())
+        );
+    }
+
+    // 선택한 약의 등록·미등록 서류 목록을 조회한다.
+    @Transactional(readOnly = true)
+    public MedicationDocumentListRes getByMedication(Long userId, Long medicationId) {
+        Medication medication = medicationRepository.findByIdAndUser_Id(medicationId, userId)
+                .orElseThrow(MedicationNotFoundException::new);
+
+        List<MedicationDocumentListRes.Item> documents = checklistItemRepository
+                .findByTripMedication_Medication_IdAndTripMedication_Medication_User_IdAndRequirementTemplate_Kind(
+                        medicationId,
+                        userId,
+                        RequirementKind.UPLOAD
+                )
+                .stream()
+                .sorted(Comparator
+                        .comparing((ChecklistItem item) -> item.getDocument() == null)
+                        .thenComparing(ChecklistItem::getId))
+                .map(MedicationDocumentListRes.Item::from)
+                .toList();
+
+        return new MedicationDocumentListRes(
+                medication.getId(),
+                medication.getProduct().getProductKoName(),
+                documents
         );
     }
 

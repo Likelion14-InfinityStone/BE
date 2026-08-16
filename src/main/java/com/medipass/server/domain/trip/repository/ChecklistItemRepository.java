@@ -30,6 +30,14 @@ public interface ChecklistItemRepository extends JpaRepository<ChecklistItem, Lo
             RequirementKind kind
     );
 
+    // 약품별 서류 목록 — 업로드형 체크리스트와 등록된 서류를 함께 조회한다.
+    @EntityGraph(attributePaths = {"requirementTemplate", "document"})
+    List<ChecklistItem> findByTripMedication_Medication_IdAndTripMedication_Medication_User_IdAndRequirementTemplate_Kind(
+            Long medicationId,
+            Long userId,
+            RequirementKind kind
+    );
+
     // 여행 삭제 시 — 해당 여행-약들의 체크리스트 일괄 삭제
     void deleteByTripMedication_IdIn(List<Long> tripMedicationIds);
 }
