@@ -1,5 +1,6 @@
 package com.medipass.server.domain.trip.entity;
 
+import com.medipass.server.domain.document.entity.Document;
 import com.medipass.server.domain.regulation.entity.RequirementTemplate;
 import jakarta.persistence.*;
 import lombok.*;
@@ -34,7 +35,10 @@ public class ChecklistItem {
     @Column(name = "done", nullable = false)
     private boolean done;
 
-    // TODO: 서류 업로드(S3, document) 연결은 서류함 범위에서 추가
+    // 업로드된 서류 — 체크리스트 항목당 최대 한 건
+    @OneToOne(mappedBy = "checklistItem", fetch = FetchType.LAZY,
+            cascade = CascadeType.ALL, orphanRemoval = true)
+    private Document document;
 
     // 여행-약에 필요한 서류 한 건 — 미완료 상태로 생성
     public static ChecklistItem of(TripMedication tripMedication, RequirementTemplate requirementTemplate) {
@@ -48,5 +52,17 @@ public class ChecklistItem {
     // 체크(완료) 여부 변경
     public void updateDone(boolean done) {
         this.done = done;
+    }
+
+    // 서류 연결과 체크리스트 완료 처리를 함께 수행한다.
+    public void attachDocument(Document document) {
+        this.document = document;
+        this.done = true;
+    }
+
+    // 서류 연결을 해제하면 체크리스트도 미완료 상태로 되돌린다.
+    public void detachDocument() {
+        this.document = null;
+        this.done = false;
     }
 }
