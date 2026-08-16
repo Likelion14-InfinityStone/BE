@@ -56,7 +56,7 @@ public class S3StorageService {
             );
             return new UploadResult(objectKey, file.getSize(), contentType);
         } catch (IOException | SdkException e) {
-            log.error("S3 upload failed: bucket={}, key={}", properties.bucket(), objectKey, e);
+            log.error("S3 파일 업로드에 실패했습니다. 버킷={}, 객체 키={}", properties.bucket(), objectKey, e);
             throw new S3StorageException();
         }
     }
@@ -78,7 +78,7 @@ public class S3StorageService {
         try {
             return URI.create(s3Presigner.presignGetObject(presignRequest).url().toString());
         } catch (SdkException e) {
-            log.error("S3 presigned URL creation failed: bucket={}, key={}",
+            log.error("S3 임시 다운로드 URL 생성에 실패했습니다. 버킷={}, 객체 키={}",
                     properties.bucket(), objectKey, e);
             throw new S3StorageException();
         }
@@ -96,7 +96,7 @@ public class S3StorageService {
         try {
             s3Client.deleteObject(request);
         } catch (SdkException e) {
-            log.error("S3 delete failed: bucket={}, key={}", properties.bucket(), objectKey, e);
+            log.error("S3 파일 삭제에 실패했습니다. 버킷={}, 객체 키={}", properties.bucket(), objectKey, e);
             throw new S3StorageException();
         }
     }

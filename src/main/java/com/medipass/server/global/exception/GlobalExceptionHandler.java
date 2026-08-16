@@ -1,11 +1,13 @@
 package com.medipass.server.global.exception;
 
+import com.medipass.server.domain.document.exception.DocumentErrorCode;
 import com.medipass.server.global.response.ApiResponse;
 import com.medipass.server.global.response.ErrorDetail;
 import com.medipass.server.global.response.FieldError;
 import com.medipass.server.global.ocr.exception.OcrErrorCode;
 import com.medipass.server.global.response.code.BaseResponseCode;
 import com.medipass.server.global.response.code.ErrorResponseCode;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -86,8 +88,14 @@ public class GlobalExceptionHandler {
 
     /** 서버의 멀티파트 제한을 초과한 파일 업로드 */
     @ExceptionHandler(MaxUploadSizeExceededException.class)
-    public ResponseEntity<ApiResponse<Object>> handleMaxUploadSizeExceeded(MaxUploadSizeExceededException e) {
+    public ResponseEntity<ApiResponse<Object>> handleMaxUploadSizeExceeded(
+            MaxUploadSizeExceededException e,
+            HttpServletRequest request
+    ) {
         log.warn("MaxUploadSizeExceededException: {}", e.getMessage());
+        if (request.getRequestURI().endsWith("/document")) {
+            return error(DocumentErrorCode.FILE_TOO_LARGE);
+        }
         return error(OcrErrorCode.FILE_TOO_LARGE);
     }
 
