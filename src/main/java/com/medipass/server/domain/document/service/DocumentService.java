@@ -6,6 +6,7 @@ import com.medipass.server.domain.document.exception.DocumentErrorCode;
 import com.medipass.server.domain.document.exception.DocumentException;
 import com.medipass.server.domain.document.repository.DocumentRepository;
 import com.medipass.server.domain.document.web.dto.DocumentMainRes;
+import com.medipass.server.domain.document.web.dto.DocumentPreviewRes;
 import com.medipass.server.domain.document.web.dto.MedicationDocumentListRes;
 import com.medipass.server.domain.document.web.dto.DocumentUploadRes;
 import com.medipass.server.domain.medication.entity.Medication;
@@ -115,6 +116,25 @@ public class DocumentService {
                 medication.getId(),
                 medication.getProduct().getProductKoName(),
                 documents
+        );
+    }
+
+    // 서류 정보와 PDF 미리보기 URL을 조회한다.
+    @Transactional(readOnly = true)
+    public DocumentPreviewRes getPreview(Long userId, Long documentId) {
+        Document document = documentRepository
+                .findByIdAndChecklistItem_TripMedication_Trip_User_Id(documentId, userId)
+                .orElseThrow(() -> new BaseException(
+                        ErrorResponseCode.NOT_FOUND_RESOURCE,
+                        "서류를 찾을 수 없습니다."
+                ));
+
+        return DocumentPreviewRes.from(
+                document,
+                s3StorageService.createPreviewUrl(
+                        document.getObjectKey(),
+                        document.getOriginalFilename()
+                )
         );
     }
 

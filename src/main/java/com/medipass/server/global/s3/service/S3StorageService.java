@@ -63,12 +63,26 @@ public class S3StorageService {
 
     // 원본 파일명으로 내려받을 수 있는 임시 URL을 생성한다.
     public URI createDownloadUrl(String objectKey, String originalFilename) {
+        return createGetUrl(objectKey, originalFilename, "attachment", "다운로드");
+    }
+
+    // 브라우저나 앱에서 PDF를 바로 표시할 수 있는 임시 URL을 생성한다.
+    public URI createPreviewUrl(String objectKey, String originalFilename) {
+        return createGetUrl(objectKey, originalFilename, "inline", "미리보기");
+    }
+
+    private URI createGetUrl(
+            String objectKey,
+            String originalFilename,
+            String dispositionType,
+            String purpose
+    ) {
         validateDocumentKey(objectKey);
 
         GetObjectRequest getObjectRequest = GetObjectRequest.builder()
                 .bucket(properties.bucket())
                 .key(objectKey)
-                .responseContentDisposition(contentDisposition(originalFilename))
+                .responseContentDisposition(contentDisposition(dispositionType, originalFilename))
                 .build();
         GetObjectPresignRequest presignRequest = GetObjectPresignRequest.builder()
                 .signatureDuration(properties.presignedUrlExpiration())
@@ -78,8 +92,8 @@ public class S3StorageService {
         try {
             return URI.create(s3Presigner.presignGetObject(presignRequest).url().toString());
         } catch (SdkException e) {
-            log.error("S3 임시 다운로드 URL 생성에 실패했습니다. 버킷={}, 객체 키={}",
-                    properties.bucket(), objectKey, e);
+            log.error("S3 임시 {} URL 생성에 실패했습니다. 버킷={}, 객체 키={}",
+                    purpose, properties.bucket(), objectKey, e);
             throw new S3StorageException();
         }
     }
@@ -114,13 +128,13 @@ public class S3StorageService {
         return extension.toLowerCase(Locale.ROOT);
     }
 
-    private String contentDisposition(String originalFilename) {
+    private String contentDisposition(String dispositionType, String originalFilename) {
         String filename = originalFilename == null || originalFilename.isBlank()
                 ? "document"
                 : originalFilename.replace("\r", "").replace("\n", "");
         String encodedFilename = URLEncoder.encode(filename, StandardCharsets.UTF_8)
                 .replace("+", "%20");
-        return "attachment; filename*=UTF-8''" + encodedFilename;
+        return dispositionType + "; filename*=UTF-8''" + encodedFilename;
     }
 
     private void validateDocumentKey(String objectKey) {
