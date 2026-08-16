@@ -1,6 +1,7 @@
 package com.medipass.server.domain.document.web.controller;
 
-import com.medipass.server.domain.document.service.DocumentService;
+import com.medipass.server.domain.document.service.DocumentQueryService;
+import com.medipass.server.domain.document.web.dto.DocumentDownloadRes;
 import com.medipass.server.domain.document.web.dto.DocumentMainRes;
 import com.medipass.server.domain.document.web.dto.DocumentPreviewRes;
 import com.medipass.server.global.jwt.CustomUserDetails;
@@ -11,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -20,7 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class DocumentCabinetController {
 
-    private final DocumentService documentService;
+    private final DocumentQueryService documentQueryService;
 
     @Operation(
             summary = "서류함 메인 조회",
@@ -31,7 +33,7 @@ public class DocumentCabinetController {
             @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
         return ApiResponse.success(
-                documentService.getMain(userDetails.getUser().getId())
+                documentQueryService.getMain(userDetails.getUser().getId())
         );
     }
 
@@ -45,7 +47,24 @@ public class DocumentCabinetController {
             @PathVariable Long documentId
     ) {
         return ApiResponse.success(
-                documentService.getPreview(
+                documentQueryService.getPreview(
+                        userDetails.getUser().getId(),
+                        documentId
+                )
+        );
+    }
+
+    @Operation(
+            summary = "서류 다운로드",
+            description = "원본 파일명으로 PDF를 내려받을 수 있는 임시 다운로드 URL을 발급합니다."
+    )
+    @PostMapping("/{documentId}/download")
+    public ApiResponse<DocumentDownloadRes> getDownload(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @PathVariable Long documentId
+    ) {
+        return ApiResponse.success(
+                documentQueryService.getDownload(
                         userDetails.getUser().getId(),
                         documentId
                 )

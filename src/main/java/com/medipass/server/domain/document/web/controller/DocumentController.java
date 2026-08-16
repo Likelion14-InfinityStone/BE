@@ -1,7 +1,7 @@
 package com.medipass.server.domain.document.web.controller;
 
 import com.medipass.server.domain.document.entity.DocumentType;
-import com.medipass.server.domain.document.service.DocumentService;
+import com.medipass.server.domain.document.service.DocumentCommandService;
 import com.medipass.server.domain.document.web.dto.DocumentUploadRes;
 import com.medipass.server.global.jwt.CustomUserDetails;
 import com.medipass.server.global.response.ApiResponse;
@@ -28,7 +28,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 public class DocumentController {
 
-    private final DocumentService documentService;
+    private final DocumentCommandService documentCommandService;
 
     @Operation(
             summary = "체크리스트 서류 업로드",
@@ -49,7 +49,7 @@ public class DocumentController {
             @Parameter(description = "최대 10MB PDF 파일", required = true)
             @RequestPart("file") MultipartFile file
     ) {
-        DocumentUploadRes response = documentService.upload(
+        DocumentUploadRes response = documentCommandService.upload(
                 userDetails.getUser().getId(),
                 tripId,
                 tripMedicationId,

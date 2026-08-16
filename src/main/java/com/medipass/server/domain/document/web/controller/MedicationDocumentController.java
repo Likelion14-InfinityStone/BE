@@ -1,6 +1,6 @@
 package com.medipass.server.domain.document.web.controller;
 
-import com.medipass.server.domain.document.service.DocumentService;
+import com.medipass.server.domain.document.service.DocumentQueryService;
 import com.medipass.server.domain.document.web.dto.MedicationDocumentListRes;
 import com.medipass.server.global.jwt.CustomUserDetails;
 import com.medipass.server.global.response.ApiResponse;
@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class MedicationDocumentController {
 
-    private final DocumentService documentService;
+    private final DocumentQueryService documentQueryService;
 
     @Operation(
             summary = "약품별 서류 목록 조회",
@@ -31,7 +31,7 @@ public class MedicationDocumentController {
             @PathVariable Long medicationId
     ) {
         return ApiResponse.success(
-                documentService.getByMedication(
+                documentQueryService.getByMedication(
                         userDetails.getUser().getId(),
                         medicationId
                 )
