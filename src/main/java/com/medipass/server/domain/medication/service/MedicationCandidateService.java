@@ -41,19 +41,12 @@ public class MedicationCandidateService {
             }
         }
 
-        /*
-         * MVP에서는 별도의 후보 선택 화면을 제공하지 않는다.
-         * 식약처 검색 결과가 한 건이면 해당 제품을 사용하고, 여러 건이면
-         * 식약처가 반환한 순서를 신뢰하여 첫 번째 제품을 자동 매칭한다.
-         * 검색 결과가 없을 때는 matchedProduct를 null로 내려 프론트에서
-         * 직접 입력 또는 재촬영 흐름으로 처리할 수 있도록 한다.
-         */
-        MedicationCandidateRecord matchedProduct = result.items().stream()
-                .findFirst()
+        // 직접 입력 화면에서 정확한 함량·제형을 선택할 수 있도록 검색 후보 전체를 반환한다.
+        var candidates = result.items().stream()
                 .map(this::toCandidateResponse)
-                .orElse(null);
+                .toList();
 
-        return new MedicationCandidateSearchRes(searchKeyword, result.totalCount(), matchedProduct);
+        return new MedicationCandidateSearchRes(searchKeyword, result.totalCount(), candidates);
     }
 
     private String removeTrailingDosage(String searchKeyword) {

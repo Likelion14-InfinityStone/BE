@@ -29,8 +29,8 @@ public class MedicationScanService {
         /*
          * 프론트가 OCR API와 식약처 매칭 API를 따로 호출하지 않도록
          * OCR에서 추출된 각 제품명을 백엔드에서 즉시 자동 매칭한다.
-         * 식약처 결과가 여러 건이면 MedicationCandidateService의 MVP 정책에 따라
-         * 첫 번째 제품이 선택되고, 결과가 없으면 matchedProduct는 null이 된다.
+         * 식약처 결과가 여러 건이면 스캔 흐름에서는 기존처럼 첫 번째 제품을 자동 선택한다.
+         * 직접 입력 흐름에서는 후보 목록을 사용자에게 보여 주고 선택하도록 한다.
          */
         return new MedicationScanRes(
                 parsed.dispensedAt(),
@@ -44,7 +44,9 @@ public class MedicationScanService {
     private ScannedMedicationRecord matchMedication(ScannedMedicationRecord medication) {
         MedicationCandidateRecord matchedProduct = medicationCandidateService
                 .search(medication.ocrProductText())
-                .matchedProduct();
+                .candidates().stream()
+                .findFirst()
+                .orElse(null);
 
         if (matchedProduct == null
                 || matchedProduct.mfdsProductCode() == null
