@@ -21,15 +21,13 @@ public class MedicationCandidateController {
     private final MedicationCandidateService medicationCandidateService;
 
     /*
-     * 기본 OCR 등록 흐름에서는 MedicationScanService가 식약처 자동 매칭을 내부 수행하므로
-     * 프론트가 이 API를 별도로 호출할 필요가 없다.
-     * 자동 매칭 실패 또는 향후 사용자가 제품명을 수정하는 기능이 추가될 때,
-     * 수정된 제품명으로 식약처 제품을 다시 매칭하기 위한 확장용 엔드포인트로 유지한다.
+     * OCR 등록 흐름에서는 MedicationScanService가 식약처 자동 매칭을 내부 수행한다.
+     * 직접 입력 흐름에서는 사용자가 입력한 제품명으로 이 API를 호출한 뒤,
+     * 반환된 후보 중 정확한 함량·제형의 제품을 선택한다.
      */
     @Operation(
-            summary = "제품명으로 식약처 의약품 재매칭",
-            description = "향후 제품명 수정 기능에서 식약처 의약품을 재검색하기 위한 확장용 API입니다. "
-                    + "검색 결과가 여러 건이면 MVP 정책에 따라 첫 번째 제품을 반환합니다."
+            summary = "제품명으로 식약처 의약품 후보 검색",
+            description = "직접 입력한 제품명으로 식약처 의약품을 검색하고, 정확한 제품을 선택할 수 있도록 후보 목록을 반환합니다."
     )
     @GetMapping("/candidates")
     public ApiResponse<MedicationCandidateSearchRes> searchCandidates(
