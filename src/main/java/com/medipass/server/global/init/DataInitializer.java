@@ -2,6 +2,7 @@ package com.medipass.server.global.init;
 
 import com.medipass.server.domain.country.entity.Country;
 import com.medipass.server.domain.country.repository.CountryRepository;
+import com.medipass.server.domain.emergency.service.OverseasMissionSyncService;
 import com.medipass.server.domain.regulation.service.RegulationImportService;
 import com.medipass.server.domain.regulation.service.RequirementImportService;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +26,7 @@ public class DataInitializer implements ApplicationRunner {
     private final CountryRepository countryRepository;
     private final RegulationImportService regulationImportService;
     private final RequirementImportService requirementImportService;
+    private final OverseasMissionSyncService overseasMissionSyncService;
 
     // 국가 마스터 시드 (code, code_alpha3, name_ko, name_en, local_lang) — 10개국
     private static final List<String[]> COUNTRIES = List.of(
@@ -45,6 +47,8 @@ public class DataInitializer implements ApplicationRunner {
         seedCountries();
         regulationImportService.importAll();
         requirementImportService.importAll();
+        // 재외공관은 외부 API 라 매번 부르지 않고, 아직 없는 국가만 한 번 가져온다
+        overseasMissionSyncService.syncAllIfAbsent();
     }
 
     private void seedCountries() {
