@@ -45,19 +45,22 @@ public record MedicationCardDetailRes(
                         medication.getTotalDays(),
                         medication.getDosePerIntake(),
                         medication.getDoseUnit(),
-                        connectedCountries(tripMedications)
+                        connectedCountries(tripMedications, language)
                 )
         );
     }
 
-    private static List<ConnectedCountry> connectedCountries(List<TripMedication> tripMedications) {
+    private static List<ConnectedCountry> connectedCountries(
+            List<TripMedication> tripMedications,
+            MedicationCardLanguage language
+    ) {
         Map<String, Country> countriesByCode = new LinkedHashMap<>();
         for (TripMedication tripMedication : tripMedications) {
             Country country = tripMedication.getTrip().getDestinationCountry();
             countriesByCode.putIfAbsent(country.getCode(), country);
         }
         return countriesByCode.values().stream()
-                .map(ConnectedCountry::from)
+                .map(country -> ConnectedCountry.from(country, language))
                 .toList();
     }
 
@@ -79,8 +82,11 @@ public record MedicationCardDetailRes(
     }
 
     public record ConnectedCountry(String code, String name) {
-        private static ConnectedCountry from(Country country) {
-            return new ConnectedCountry(country.getCode(), country.getNameKo());
+        private static ConnectedCountry from(Country country, MedicationCardLanguage language) {
+            String localizedName = language == MedicationCardLanguage.EN
+                    ? country.getNameEn()
+                    : country.getNameKo();
+            return new ConnectedCountry(country.getCode(), localizedName);
         }
     }
 }
