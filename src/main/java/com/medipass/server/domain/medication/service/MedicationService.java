@@ -4,7 +4,6 @@ import com.medipass.server.domain.medication.entity.Medication;
 import com.medipass.server.domain.medication.entity.MfdsProduct;
 import com.medipass.server.domain.medication.exception.MedicationDuplicateException;
 import com.medipass.server.domain.medication.exception.MedicationNotFoundException;
-import com.medipass.server.domain.medication.exception.MedicationProductMismatchException;
 import com.medipass.server.domain.medication.repository.MedicationRepository;
 import com.medipass.server.domain.medication.web.dto.MedicationCreateReq;
 import com.medipass.server.domain.medication.web.dto.MedicationCreateRes;
@@ -168,7 +167,6 @@ public class MedicationService {
          */
         MfdsProduct product = mfdsProductService.getOrCreate(
                 item.mfdsProductCode().trim(), item.productKoName().trim());
-        validateProductIdentity(product, item);
 
         return Medication.create(
                 user,
@@ -180,16 +178,6 @@ public class MedicationService {
                 item.dosePerIntake(),
                 item.doseUnit()
         );
-    }
-
-    // 프론트에서 수정할 수 없는 스캔 제품명이 식약처 제품 마스터와 일치하는지 검증한다.
-    private void validateProductIdentity(MfdsProduct product, MedicationCreateReq.Item item) {
-        boolean koreanNameMismatch = !product.getProductKoName().equals(item.productKoName().trim());
-        boolean englishNameMismatch = !product.getProductEnName().equals(item.productEnName().trim());
-
-        if (koreanNameMismatch || englishNameMismatch) {
-            throw new MedicationProductMismatchException();
-        }
     }
 
     private String trimToNull(String value) {
