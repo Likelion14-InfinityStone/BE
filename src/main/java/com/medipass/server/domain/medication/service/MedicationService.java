@@ -25,6 +25,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -121,7 +122,10 @@ public class MedicationService {
                         "사용자 정보를 찾을 수 없습니다."
                 ));
 
-        validateNoDuplicates(userId, request);
+        DuplicateFilterResult duplicateFilterResult = filterDuplicates(userId, request.medications());
+        if (duplicateFilterResult.medicationsToCreate().isEmpty()) {
+            throw new MedicationDuplicateException();
+        }
 
         /*
          * 조제일과 발행기관은 한 장의 약 봉투에서 추출된 공통 정보이므로
@@ -129,31 +133,55 @@ public class MedicationService {
          * 복용 횟수·일수·1회 복용량은 OCR 결과 확인 화면에서 사용자가
          * 보정한 최종 값을 요청으로 받아 저장한다.
          */
-        List<Medication> medications = request.medications().stream()
+        List<Medication> medications = duplicateFilterResult.medicationsToCreate().stream()
                 .map(item -> toMedication(user, request, item))
                 .toList();
 
         try {
-            return MedicationCreateRes.from(medicationRepository.saveAllAndFlush(medications));
+            return MedicationCreateRes.from(
+                    medicationRepository.saveAllAndFlush(medications),
+                    duplicateFilterResult.skippedMedications()
+            );
         } catch (DataIntegrityViolationException e) {
             // 사전 검사 이후 동시에 같은 약이 등록된 경우에도 동일한 409 응답을 보장한다.
             throw new MedicationDuplicateException();
         }
     }
 
-    private void validateNoDuplicates(Long userId, MedicationCreateReq request) {
+    private DuplicateFilterResult filterDuplicates(
+            Long userId,
+            List<MedicationCreateReq.Item> requestedMedications
+    ) {
         Set<String> requestedProductCodes = new HashSet<>();
+        Set<String> skippedProductCodes = new HashSet<>();
+        List<MedicationCreateReq.Item> medicationsToCreate = new ArrayList<>();
+        List<MedicationCreateRes.SkippedMedication> skippedMedications = new ArrayList<>();
 
-        for (MedicationCreateReq.Item item : request.medications()) {
+        for (MedicationCreateReq.Item item : requestedMedications) {
             String productCode = item.mfdsProductCode().trim();
             boolean duplicatedInRequest = !requestedProductCodes.add(productCode);
+            if (duplicatedInRequest) {
+                // 같은 요청에 반복된 항목은 한 번만 처리한다.
+                continue;
+            }
+
             boolean alreadyRegistered = medicationRepository
                     .existsByUser_IdAndProduct_MfdsProductCode(userId, productCode);
 
-            if (duplicatedInRequest || alreadyRegistered) {
-                throw new MedicationDuplicateException();
+            if (alreadyRegistered) {
+                if (skippedProductCodes.add(productCode)) {
+                    skippedMedications.add(MedicationCreateRes.SkippedMedication.duplicate(item));
+                }
+                continue;
             }
+
+            medicationsToCreate.add(item);
         }
+
+        return new DuplicateFilterResult(
+                List.copyOf(medicationsToCreate),
+                List.copyOf(skippedMedications)
+        );
     }
 
     private Medication toMedication(
@@ -185,5 +213,11 @@ public class MedicationService {
             return null;
         }
         return value.trim();
+    }
+
+    private record DuplicateFilterResult(
+            List<MedicationCreateReq.Item> medicationsToCreate,
+            List<MedicationCreateRes.SkippedMedication> skippedMedications
+    ) {
     }
 }

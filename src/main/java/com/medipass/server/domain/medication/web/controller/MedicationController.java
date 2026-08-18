@@ -39,7 +39,9 @@ public class MedicationController {
 
     @Operation(
             summary = "OCR 확인 결과로 의약품 등록",
-            description = "스캔 API가 반환한 식약처 제품정보와 사용자가 확인·수정한 복용 정보를 최종 의약품으로 저장합니다."
+            description = "스캔 API가 반환한 식약처 제품정보와 사용자가 확인·수정한 복용 정보를 최종 의약품으로 저장합니다. "
+                    + "이미 등록된 의약품이 일부 포함되면 해당 항목만 제외하고 나머지를 저장하며 skippedMedications로 반환합니다. "
+                    + "모든 의약품이 중복인 경우에는 MEDICATION_409_1을 반환합니다."
     )
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
