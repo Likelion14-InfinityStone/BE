@@ -25,6 +25,9 @@ public class MedicationScanParser {
     private static final Pattern DATE_PATTERN = Pattern.compile(
             "(20\\d{2})\\s*[년./-]\\s*(\\d{1,2})\\s*[월./-]\\s*(\\d{1,2})\\s*일?"
     );
+    private static final Pattern HOSPITAL_INFO_PATTERN = Pattern.compile(
+            "병원\\s*정보\\s*[:：·]?\\s*(.+?)(?=\\s*(?:조제\\s*일자|조제\\s*약사|환자\\s*정보|$))"
+    );
 
     public MedicationScanRes parse(OcrTextResult ocrText) {
         // OCR 좌표를 행 단위로 묶은 뒤 공통 정보와 약 정보를 추출
@@ -97,12 +100,11 @@ public class MedicationScanParser {
             }
 
             String rowText = row.text();
-            int labelIndex = rowText.indexOf("병원정보");
-            if (labelIndex < 0) {
+            Matcher hospitalMatcher = HOSPITAL_INFO_PATTERN.matcher(rowText);
+            if (!hospitalMatcher.find()) {
                 continue;
             }
-            String value = rowText.substring(labelIndex + "병원정보".length())
-                    .replaceFirst("^[\\s.:：·]+", "")
+            String value = hospitalMatcher.group(1)
                     .replaceFirst("(?i)Tel[.:].*$", "")
                     .replaceFirst("\\s*\\[.*$", "")
                     .replaceFirst("\\s*\\(.*$", "")
@@ -209,15 +211,18 @@ public class MedicationScanParser {
 
     private List<OcrTextField> findPhotoMedications(List<Row> rows, double imageWidth) {
         List<OcrTextField> fields = rows.stream().flatMap(row -> row.fields().stream()).toList();
-        boolean hasPhotoHeader = fields.stream()
-                .anyMatch(field -> field.text().contains("약품사진"));
+        // "약품 사진"이 하나의 필드에 공백을 포함하거나 여러 필드로 분리돼도 헤더로 인식한다.
+        boolean hasPhotoHeader = rows.stream()
+                .map(Row::text)
+                .map(this::compact)
+                .anyMatch(text -> text.contains("약품사진"));
         if (!hasPhotoHeader) {
             return List.of();
         }
 
-        // 이미지 너비 비율로 약품명 열의 범위 결정
+        // 다양한 약봉투 레이아웃과 OCR 좌표 오차를 고려해 약품명 탐색 범위를 넓게 잡는다.
         return fields.stream()
-                .filter(field -> field.x() >= imageWidth * 0.25 && field.x() < imageWidth * 0.45)
+                .filter(field -> field.x() >= imageWidth * 0.20 && field.x() < imageWidth * 0.65)
                 .filter(this::isPhotoMedicationField)
                 .sorted(Comparator.comparingDouble(OcrTextField::y))
                 .toList();
@@ -244,7 +249,7 @@ public class MedicationScanParser {
     }
 
     private boolean isReceiptMedicationField(OcrTextField field, double imageWidth) {
-        if (field.x() >= imageWidth * 0.18) {
+        if (field.x() >= imageWidth * 0.25) {
             return false;
         }
         String text = field.text();
