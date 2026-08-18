@@ -25,9 +25,9 @@ public class MedicationScanController {
     @Operation(
             summary = "약 봉투 인식",
             description = "약 봉투에서 조제·복용 정보를 추출하고 OCR 제품명을 식약처 의약품과 자동 매칭합니다. "
-                    + "식약처 제품정보(mfdsProductCode, productKoName, productEnName) 또는 복용 단위(doseUnit)를 "
-                    + "확인하지 못하면 OCR_422를 반환하므로 재촬영 안내가 필요합니다. "
-                    + "사용자는 조제일자·발행기관·복용 횟수·복용 일수·1회 복용량만 수정할 수 있습니다."
+                    + "일부 제품의 식약처 매칭에 실패해도 인식된 결과를 반환하며, 해당 항목의 제품정보는 null입니다. "
+                    + "프론트에서는 사용자가 제품명을 직접 입력하고 후보 검색을 통해 제품을 선택하도록 안내합니다. "
+                    + "이미지에서 약품명을 하나도 추출하지 못한 경우에만 OCR_422를 반환합니다."
     )
     @PostMapping(value = "/scans", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ApiResponse<MedicationScanRes> scan(
