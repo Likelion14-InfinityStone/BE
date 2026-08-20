@@ -186,45 +186,49 @@ src/main/java/com/medipass/server
 
 Swagger UI와 OAuth2 로그인 경로를 제외한 **모든 엔드포인트는 인증이 필요합니다.**
 
-### 사용자
+### 사용자 &nbsp;·&nbsp; `/api/users`
 | Method | Endpoint | 설명 |
 |---|---|---|
-| GET | `/api/users/me` | 내 계정 정보 조회 |
+| GET | `/me` | 내 계정 정보 조회 |
 
-### 의약품
+### 의약품 &nbsp;·&nbsp; `/api/medications`
 | Method | Endpoint | 설명 |
 |---|---|---|
-| POST | `/api/medications/scans` | 약 봉투 이미지 인식 (OCR) |
-| GET | `/api/medications/candidates` | 제품명으로 식약처 의약품 후보 검색 |
-| POST | `/api/medications` | OCR 확인 결과로 의약품 등록 |
-| GET | `/api/medications` | 복약카드 목록 조회 |
-| GET | `/api/medications/cards` | 홈 화면 복약카드 조회 |
-| GET | `/api/medications/{medicationId}/card` | 복약카드 단건 상세 조회 |
-| GET | `/api/medications/{medicationId}/documents` | 약품별 서류 목록 조회 |
+| POST | `/scans` | 약 봉투 이미지 인식 (OCR) |
+| GET | `/candidates` | 제품명으로 식약처 의약품 후보 검색 |
+| POST | `/` | OCR 확인 결과로 의약품 등록 |
+| GET | `/` | 복약카드 목록 조회 |
+| GET | `/cards` | 홈 화면 복약카드 조회 |
+| GET | `/{medicationId}/card` | 복약카드 단건 상세 조회 |
+| GET | `/{medicationId}/documents` | 약품별 서류 목록 조회 |
 
-### 여행 · 체크리스트
+### 여행 &nbsp;·&nbsp; `/api/trips`
 | Method | Endpoint | 설명 |
 |---|---|---|
-| POST | `/api/trips/analyze` | 여행 정보 분석 |
-| POST | `/api/trips` | 여행 등록 |
-| GET | `/api/trips/checklog` | 여행 목록 (체크로그) |
-| GET | `/api/trips/medications` | 여행에 담을 수 있는 약 목록 |
-| GET | `/api/trips/{tripId}` | 여행 상세 조회 |
-| PATCH | `/api/trips/{tripId}/title` | 여행 제목 수정 |
-| DELETE | `/api/trips/{tripId}` | 여행 삭제 |
-| GET | `/api/trips/{tripId}/medications/{tripMedicationId}/destination` | 도착 국가 반입 규정 조회 |
-| GET | `/api/trips/{tripId}/medications/{tripMedicationId}/basis` | 판정 근거 조회 |
-| GET | `/api/trips/{tripId}/medications/{tripMedicationId}/checklist` | 준비 체크리스트 조회 |
-| PATCH | `/api/trips/{tripId}/medications/{tripMedicationId}/checklist/{checklistItemId}` | 체크리스트 완료 상태 변경 |
-| POST | `/api/trips/{tripId}/medications/{tripMedicationId}/checklist/{checklistItemId}/document` | 체크리스트 서류 업로드 |
+| POST | `/analyze` | 여행 정보 분석 |
+| POST | `/` | 여행 등록 |
+| GET | `/checklog` | 여행 목록 (체크로그) |
+| GET | `/medications` | 여행에 담을 수 있는 약 목록 |
+| GET | `/{tripId}` | 여행 상세 조회 |
+| PATCH | `/{tripId}/title` | 여행 제목 수정 |
+| DELETE | `/{tripId}` | 여행 삭제 |
 
-### 서류함
+### 여행별 약 · 체크리스트 &nbsp;·&nbsp; `/api/trips/{tripId}/medications/{tripMedicationId}`
 | Method | Endpoint | 설명 |
 |---|---|---|
-| GET | `/api/documents` | 서류함 메인 조회 |
-| GET | `/api/documents/{documentId}` | 서류 보기 (미리보기 URL 발급) |
-| POST | `/api/documents/{documentId}/download` | 서류 다운로드 URL 발급 |
-| DELETE | `/api/documents/{documentId}` | 서류 삭제 |
+| GET | `/destination` | 도착 국가 반입 규정 조회 |
+| GET | `/basis` | 판정 근거 조회 |
+| GET | `/checklist` | 준비 체크리스트 조회 |
+| PATCH | `/checklist/{checklistItemId}` | 체크리스트 완료 상태 변경 |
+| POST | `/checklist/{checklistItemId}/document` | 체크리스트 서류 업로드 |
+
+### 서류함 &nbsp;·&nbsp; `/api/documents`
+| Method | Endpoint | 설명 |
+|---|---|---|
+| GET | `/` | 서류함 메인 조회 |
+| GET | `/{documentId}` | 서류 보기 (미리보기 URL 발급) |
+| POST | `/{documentId}/download` | 서류 다운로드 URL 발급 |
+| DELETE | `/{documentId}` | 서류 삭제 |
 
 ### 규제 판정 · SOS
 | Method | Endpoint | 설명 |
