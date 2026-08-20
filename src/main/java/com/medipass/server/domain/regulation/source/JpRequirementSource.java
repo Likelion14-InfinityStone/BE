@@ -16,6 +16,20 @@ import java.util.List;
 public class JpRequirementSource implements CountryRequirementSource {
 
     private static final String COUNTRY_CODE = "JP";
+    /**
+     * 후생노동성 마약단속부(NCD) 수입·수출 허가 신청 안내 페이지.
+     * 신청서 양식(Word) 4종·제출처 목록·절차가 한 페이지에 있다.
+     * #narcotics 앵커가 신청 안내 섹션이다 (#list 는 규제 성분 목록 섹션이라 다름).
+     *
+     * 양식 직링크가 필요하면 아래를 쓰면 된다.
+     *   마약 수입      https://www.ncd.mhlw.go.jp/dl_data/keitai/import_form_n_en.docx
+     *   마약 수출      https://www.ncd.mhlw.go.jp/dl_data/keitai/export_form_n_en.docx
+     *   각성제원료 수입 https://www.ncd.mhlw.go.jp/dl_data/keitai/import_form_s_en.docx
+     *   각성제원료 수출 https://www.ncd.mhlw.go.jp/dl_data/keitai/export_form_s_en.docx
+     *   제출처 목록     https://www.ncd.mhlw.go.jp/dl_data/keitai/area_en.pdf
+     */
+    private static final String NCD_APPLICATION_URL =
+            "https://www.ncd.mhlw.go.jp/en/application2.html#narcotics";
 
     @Override
     public String countryCode() {
@@ -27,9 +41,9 @@ public class JpRequirementSource implements CountryRequirementSource {
         List<RequirementTemplateRecord> list = new ArrayList<>();
 
         // N — 마약 (수입/수출 허가 필요)
-        list.add(t("N", RequirementKind.ACTION, "마약 수입 허가 신청서",
+        list.add(t("N", RequirementKind.ACTION, "마약 수입 허가 신청서", NCD_APPLICATION_URL,
                 "일본 입국 시 필요. 관할 지방후생국 마약단속부(NCD)에 최소 14일 전 제출 (이메일/FAX/우편)"));
-        list.add(t("N", RequirementKind.ACTION, "마약 수출 허가 신청서",
+        list.add(t("N", RequirementKind.ACTION, "마약 수출 허가 신청서", NCD_APPLICATION_URL,
                 "일본 출국 시(잔여 약 반출) 필요. 불필요하면 이메일에 그 취지를 기재"));
         list.add(t("N", RequirementKind.UPLOAD, "영문 의사 진단서",
                 "이름·주소·구체적 복용 사유·약 목록(용량·함량)·처방의 서명·발급일(3개월 이내) 포함"));
@@ -37,9 +51,9 @@ public class JpRequirementSource implements CountryRequirementSource {
                 "약 이름·함량 확인용. JPEG/PDF/Word 로 제출 (HEIC 불가)"));
 
         // SRM — 각성제 원료 (수입/수출 허가 필요)
-        list.add(t("SRM", RequirementKind.ACTION, "각성제 원료 수입 허가 신청서",
+        list.add(t("SRM", RequirementKind.ACTION, "각성제 원료 수입 허가 신청서", NCD_APPLICATION_URL,
                 "일본 입국 시 필요. 관할 NCD 에 최소 14일 전 제출"));
-        list.add(t("SRM", RequirementKind.ACTION, "각성제 원료 수출 허가 신청서",
+        list.add(t("SRM", RequirementKind.ACTION, "각성제 원료 수출 허가 신청서", NCD_APPLICATION_URL,
                 "일본 출국 시(잔여 약 반출) 필요. 불필요하면 이메일에 그 취지를 기재"));
         list.add(t("SRM", RequirementKind.UPLOAD, "영문 의사 진단서",
                 "이름·주소·구체적 복용 사유·약 목록(용량·함량)·처방의 서명·발급일(3개월 이내) 포함"));
